@@ -1,74 +1,81 @@
 import Foundation
+import PocketCastsUtils
 
 public enum ServerConstants {
+    /// Server URLs and support links. All values are sourced from
+    /// `WhitelabelConfig` — the white-label default ships empty strings
+    /// so a build with no configured backend produces empty URLs that
+    /// callers can detect and gate UI on (Discover empty state, hidden
+    /// account flows, etc.). Branded forks fill the values in via the
+    /// `config/whitelabel/whitelabel.json` (or their own JSON) consumed
+    /// by `scripts/generate_whitelabel_config.sh`.
     public enum Urls {
         public static func main() -> String {
-            production() ? "https://refresh.pocketcasts.com/" : "https://refresh.pocketcasts.net/"
+            production() ? WhitelabelConfig.refreshProductionURL : WhitelabelConfig.refreshStagingURL
         }
 
         public static func api() -> String {
-            production() ? "https://api.pocketcasts.com/" : "https://api.pocketcasts.net/"
+            production() ? WhitelabelConfig.apiProductionURL : WhitelabelConfig.apiStagingURL
         }
 
         public static func cache() -> String {
-            production() ? "https://cache.pocketcasts.com/" : "https://podcast-api.pocketcasts.net/"
+            production() ? WhitelabelConfig.cacheProductionURL : WhitelabelConfig.cacheStagingURL
         }
 
         public static func sharing() -> String {
-            production() ? "https://sharing.pocketcasts.com/" : "https://sharing.pocketcasts.net/"
+            production() ? WhitelabelConfig.sharingProductionURL : WhitelabelConfig.sharingStagingURL
         }
 
         public static func discover() -> String {
-            production() ? "https://static.pocketcasts.com/discover/" : "https://static.pocketcasts.net/discover/"
+            production() ? WhitelabelConfig.discoverProductionURL : WhitelabelConfig.discoverStagingURL
         }
 
         public static func image() -> String {
-            production() ? "https://static.pocketcasts.com/" : "https://static.pocketcasts.net/"
+            production() ? WhitelabelConfig.imageProductionURL : WhitelabelConfig.imageStagingURL
         }
 
         public static func files() -> String {
-            production() ? "https://files.pocketcasts.com/files/" : "https://files.pocketcasts.com/files/"
+            production() ? WhitelabelConfig.filesProductionURL : WhitelabelConfig.filesStagingURL
         }
 
         public static func share() -> String {
-            production() ? "https://pca.st/" : "https://pcast.pocketcasts.net/"
+            production() ? WhitelabelConfig.shareProductionURL : WhitelabelConfig.shareStagingURL
         }
 
         public static func lists() -> String {
-            production() ? "https://lists.pocketcasts.com/" : "https://lists.pocketcasts.net/"
+            production() ? WhitelabelConfig.listsProductionURL : WhitelabelConfig.listsStagingURL
         }
 
         public static var search: String {
-            production() ? "https://search.pocketcasts.com/" : "https://search.pocketcasts.net/"
+            production() ? WhitelabelConfig.searchProductionURL : WhitelabelConfig.searchStagingURL
         }
 
         public static var generatedTranscripts: String {
-            production() ? "https://shownotes.pocketcasts.com/generated_transcripts/" : "https://shownotes.pocketcasts.net/generated_transcripts/"
+            production() ? WhitelabelConfig.generatedTranscriptsProductionURL : WhitelabelConfig.generatedTranscriptsStagingURL
         }
 
-        public static var tvPair: String {
-            production() ? "https://pocketcasts.com/pair" : "https://pocketcasts.net/pair"
-        }
+        public static var tvPair: String { WhitelabelConfig.tvPairURL }
+        public static var tvCreate: String { WhitelabelConfig.tvCreateURL }
 
-        public static var tvCreate: String {
-            production() ? "https://pocketcasts.com/create" : "https://pocketcasts.net/create"
-        }
-
-        public static let support = "https://support.pocketcasts.com/ios/"
-        public static let cancelSubscription = "https://support.pocketcasts.com/knowledge-base/how-to-cancel-a-subscription/"
-        public static let termsOfUse = "https://support.pocketcasts.com/article/terms-of-use/"
-        public static let privacyPolicy = "https://support.pocketcasts.com/article/privacy-policy/"
-        public static let plusInfo = "https://pocketcasts.com/plus/"
-        public static let pocketcastsDotCom = "https://pocketcasts.com/"
+        public static let support = WhitelabelConfig.supportURL
+        public static let cancelSubscription = WhitelabelConfig.cancelSubscriptionURL
+        public static let termsOfUse = WhitelabelConfig.termsOfUseURL
+        public static let privacyPolicy = WhitelabelConfig.privacyPolicyURL
+        public static let plusInfo = WhitelabelConfig.plusInfoURL
+        public static let pocketcastsDotCom = WhitelabelConfig.websiteURL
+        // `automatticDotCom` and `automatticWorkWithUs` stay literal —
+        // these point at Automattic the company, not at a Pocket Casts
+        // service. White-label callers (AboutView et al.) gate the rows
+        // that use them on WhitelabelConfig.brandName presence.
         public static let automatticDotCom = "https://automattic.com/"
         public static let automatticWorkWithUs = "https://automattic.com/work-with-us/"
-        public static let appStore = "https://apps.apple.com/app/id414834813"
-        public static let appStoreReview = "https://apps.apple.com/app/id414834813?action=write-review"
-        public static let podrollLearnMore = "https://support.pocketcasts.com/knowledge-base/podroll/"
-        public static let supportPlaybackDownloadErrors = "https://support.pocketcasts.com/knowledge-base/download-and-playback-errors/"
-        public static let supportEpisodeAccessIssues = "https://support.pocketcasts.com/knowledge-base/episode-access-issues/"
-        public static let supportEpisodeNotFound = "https://support.pocketcasts.com/knowledge-base/episode-not-found/"
-        public static let supportEpisodeServerProblem = "https://support.pocketcasts.com/knowledge-base/episode-server-problem/"
+        public static let appStore = WhitelabelConfig.appStoreURL
+        public static let appStoreReview = WhitelabelConfig.appStoreReviewURL
+        public static let podrollLearnMore = WhitelabelConfig.podrollLearnMoreURL
+        public static let supportPlaybackDownloadErrors = WhitelabelConfig.supportPlaybackDownloadErrorsURL
+        public static let supportEpisodeAccessIssues = WhitelabelConfig.supportEpisodeAccessIssuesURL
+        public static let supportEpisodeNotFound = WhitelabelConfig.supportEpisodeNotFoundURL
+        public static let supportEpisodeServerProblem = WhitelabelConfig.supportEpisodeServerProblemURL
     }
 
     private static func production() -> Bool {
@@ -119,7 +126,9 @@ public enum ServerConstants {
         static let syncingV2TokenKey = "SJSyncV2Token"
         static let refreshTokenKey = "SJRefreshToken"
         static let appleAuthUserIDKey = "SJAppleAuthUserID"
-        public static let appUserAgent = "Pocket Casts"
+        public static let appUserAgent: String = WhitelabelConfig.appUserAgent.isEmpty
+            ? "Podcasts"
+            : WhitelabelConfig.appUserAgent
         static let customStorageUsed = "SJCustomStorageUsed"
         static let customStorageNumFiles = "SJCustomStorageNumFiles"
         static let customStorageUserLimit = "SJCustomStorageUserLimit"
