@@ -56,17 +56,23 @@ committed. The source of truth is
 Mirrors the existing `ApiCredentials.tpl` → `LocalApiCredentials.swift`
 pipeline (already in the project for Automattic's secrets):
 
-1. `podcasts/Whitelabel/WhitelabelConfig.tpl` — Swift template
-   with `%{key_name}` placeholders.
+1. `Modules/Sources/PocketCastsUtils/General/WhitelabelConfig.tpl` —
+   Swift template with `%{key_name}` placeholders.
 2. `config/whitelabel/whitelabel.json` — flat key/value JSON with
    one entry per template placeholder.
-3. `scripts/generate_whitelabel_config.sh` — Xcode build phase
-   script. Calls `ruby podcasts/Credentials/replace_secrets.rb -i
+3. `scripts/generate_whitelabel_config.sh` — invoked by
+   `make external_contributor` (and re-runnable any time the JSON
+   changes). Calls `ruby podcasts/Credentials/replace_secrets.rb -i
    WhitelabelConfig.tpl -s whitelabel.json` to produce
-   `podcasts/Whitelabel/WhitelabelConfig.swift`.
+   `Modules/Sources/PocketCastsUtils/General/WhitelabelConfig.swift`.
 
-The build phase runs before "Compile Sources" on every target that
-imports `WhitelabelConfig`.
+The generated file lives inside the `PocketCastsUtils` Swift Package
+module — every target that imports `PocketCastsUtils` (main app +
+NotificationExtension + NotificationContent + PodcastsIntents +
+PodcastsIntentsUI + Pocket Casts App Clip + Pocket Casts Watch App +
+Pocket Casts TV App + the `PocketCastsServer` module) gets
+`WhitelabelConfig` visible without per-target wiring. SPM
+auto-includes the generated `.swift` in the module's compile sources.
 
 ### What consumes `WhitelabelConfig`
 
@@ -194,9 +200,10 @@ A pre-push git hook enforces.
 - App-group ID derived from xcconfig (`APP_GROUP_ID`) with
   `.entitlements` files using `$(APP_GROUP_ID)` substitution.
 - Asset catalogs (`AppIcon`, `Onboarding`, `Subscription`, etc.)
-  overlaid by neutral variants under `podcasts/Whitelabel/`.
-  Selection per build configuration via
-  `EXCLUDED_SOURCE_FILE_NAMES`.
+  overlaid by neutral variants under a `Whitelabel.*.xcassets`
+  parallel set. Selection per build configuration via
+  `EXCLUDED_SOURCE_FILE_NAMES`. (Stage 3 work; the configurations
+  exist but the asset overlay isn't wired yet.)
 - `Localizable.strings` brand-stripped at build time (post-Copy
   Bundle Resources phase, via `scripts/strip_brand_strings.sh`).
 - End-of-Year feature (`podcasts/End of Year/`) excluded from
