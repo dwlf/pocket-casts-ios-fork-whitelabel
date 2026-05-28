@@ -235,8 +235,15 @@ A pre-push git hook enforces.
   schemes pass through unmodified.
 - End-of-Year feature (`podcasts/End of Year/`) excluded from
   whitelabel builds.
-- Alternate app icons trimmed to default + dark; Pocket Casts
-  brand alternates remain only in the inherited upstream scheme.
+- Alternate app icon picker hidden in whitelabel builds. The 19
+  alternate icons in `AlternateAppIcons.xcassets` (Pocket-Cats,
+  Patron-*, Pride, Halloween, etc.) all carry Pocket Casts brand
+  art; exposing the picker would let users swap the home-screen
+  icon back to branded art. `AppearanceViewController.updateTableAndData()`
+  removes the `.appIcon` section under `#if WHITELABEL`. The
+  catalog itself is still bundled (bundle-size trim is plan items
+  28-30 territory); the threat surface is closed because no UI
+  reaches the alternates.
 - `.buildkite/` is present but inert. Automattic CI infrastructure
   is not available here.
 - `.configure-files/` ships empty. The inherited `pocketcasts`

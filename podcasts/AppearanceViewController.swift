@@ -260,6 +260,16 @@ class AppearanceViewController: PCViewController, UITableViewDataSource, UITable
             newTableData = [[.themeOption, .lightTheme], [.appIcon], [.refreshArtwork, .embeddedArtwork], [.darkUpNextTheme]]
         }
 
+        // Whitelabel builds hide the App Icon picker: the 19 alternates in
+        // AlternateAppIcons.xcassets all carry Pocket Casts brand art
+        // (Pocket-Cats, Patron-*, Pride, Halloween, etc.) and exposing the
+        // picker would let users switch the home-screen icon back to
+        // branded art. Bundle-size trim of the catalog itself is a separate
+        // slice (plan items 28-30).
+        #if WHITELABEL
+        newTableData.removeAll { $0 == [.appIcon] }
+        #endif
+
         if !SubscriptionHelper.hasActiveSubscription(), !Settings.plusInfoDismissedOnAppearance() {
             newTableData.append([.plusCallout])
         }
