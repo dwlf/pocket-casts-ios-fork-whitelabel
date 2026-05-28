@@ -10,6 +10,12 @@ CURRENT_PROJECT_VERSION = $(VERSION_LONG)
 // Define a root bundle identifier so that extensions can append to it
 PRODUCT_BUNDLE_IDENTIFIER_ROOT = au.com.shiftyjelly.podcasts
 
+// App group container — substituted into every .entitlements file via
+// $(APP_GROUP_ID) and into each target Info.plist (read at runtime by
+// SharedConstants.GroupUserDefaults.groupContainerId). Prototype overrides
+// this in PocketCasts.prototype.xcconfig.
+APP_GROUP_ID = group.au.com.shiftyjelly.pocketcasts
+
 // User-facing display name. Substituted into Info.plist
 // CFBundleDisplayName + CFBundleName via $(MARKETING_NAME) so the
 // Whitelabel xcconfig can override without forking podcasts-Info.plist.

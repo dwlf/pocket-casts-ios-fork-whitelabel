@@ -93,9 +93,16 @@ to a struct (raw-value enums require compile-time strings).
 Bundle-ID Swift references (≈20 call sites) are derived from
 `Bundle.main.bundleIdentifier` instead — minimal diff against
 upstream, no config plumbing needed. App-group identifiers (which
-must match `.entitlements` files exactly) are read from
-`SharedConstants.GroupUserDefaults.groupContainerId`, populated
-from the `APP_GROUP_ID` xcconfig variable.
+must match across all five targets sharing the container) flow from
+the `APP_GROUP_ID` xcconfig variable: `.entitlements` files reference
+`$(APP_GROUP_ID)` directly, while Swift reads it from each target's
+Info.plist (`APP_GROUP_ID` key, also substituted from
+`$(APP_GROUP_ID)`) via the single
+`SharedConstants.GroupUserDefaults.groupContainerId` accessor. The
+two widget-helper constants alias that accessor rather than
+re-declaring the value. `scripts/check-app-group-id.sh` (run by
+`make build_whitelabel` / `verify-whitelabel`) fails the build if a
+hardcoded literal reappears in entitlements or Swift.
 
 ## Schemes
 
@@ -197,8 +204,10 @@ A pre-push git hook enforces.
 - Bundle ID derived from xcconfig
   (`PRODUCT_BUNDLE_IDENTIFIER_ROOT`) with Swift references using
   `Bundle.main.bundleIdentifier`.
-- App-group ID derived from xcconfig (`APP_GROUP_ID`) with
-  `.entitlements` files using `$(APP_GROUP_ID)` substitution.
+- App-group ID derived from xcconfig (`APP_GROUP_ID`): all 12
+  `.entitlements` files and the four shared-container target
+  Info.plists use `$(APP_GROUP_ID)` substitution; Swift reads it from
+  Info.plist. Guarded by `scripts/check-app-group-id.sh`.
 - Associated Domains entitlement empty in whitelabel builds.
   Upstream's `podcasts.entitlements` / `podcastsDebug.entitlements`
   pin 14 entries to `pocketcasts.com`, `pca.st`, `pocketcasts.net`,

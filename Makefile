@@ -68,14 +68,17 @@ build_staging: ## Builds using the StagingDebug configuration
        -destination 'generic/platform=iOS Simulator' \
        build
 
-build_whitelabel: ## Builds the Whitelabel Debug configuration using Xcode
+check-app-group-id: ## Fail if the app-group literal escaped $(APP_GROUP_ID) parameterisation
+	./scripts/check-app-group-id.sh
+
+build_whitelabel: check-app-group-id ## Builds the Whitelabel Debug configuration using Xcode
 	xcodebuild -project podcasts.xcodeproj \
        -scheme "Whitelabel Debug" \
        -configuration WhitelabelDebug \
        -destination 'generic/platform=iOS Simulator' \
        build
 
-verify-whitelabel: ## Builds Whitelabel Debug end-to-end (pre-push gate)
+verify-whitelabel: check-app-group-id ## Builds Whitelabel Debug end-to-end (pre-push gate)
 	xcodebuild -project podcasts.xcodeproj \
        -scheme "Whitelabel Debug" \
        -configuration WhitelabelDebug \
