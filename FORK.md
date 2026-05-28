@@ -199,6 +199,17 @@ A pre-push git hook enforces.
   `Bundle.main.bundleIdentifier`.
 - App-group ID derived from xcconfig (`APP_GROUP_ID`) with
   `.entitlements` files using `$(APP_GROUP_ID)` substitution.
+- Associated Domains entitlement empty in whitelabel builds.
+  Upstream's `podcasts.entitlements` / `podcastsDebug.entitlements`
+  pin 14 entries to `pocketcasts.com`, `pca.st`, `pocketcasts.net`,
+  `play.pocketcasts.com`, etc. (across `applinks:`, `webcredentials:`,
+  and `appclips:` prefixes); a signed whitelabel build with those
+  domains would hijack universal links and share saved passwords
+  with `pocketcasts.com`. The three Whitelabel main-app configs
+  point at `podcasts/whitelabel{,Debug}.entitlements`, which mirror
+  the upstream files but with an empty
+  `com.apple.developer.associated-domains` array. The branded
+  private fork is expected to override these with its own domains.
 - `CFBundleDisplayName` and `CFBundleName` in
   `podcasts/podcasts-Info.plist` substituted via `$(MARKETING_NAME)`.
   `MARKETING_NAME` defaults to `Pocket Casts` in

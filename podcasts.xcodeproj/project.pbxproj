@@ -9181,7 +9181,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Whitelabel";
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = podcasts/podcastsDebug.entitlements;
+				CODE_SIGN_ENTITLEMENTS = podcasts/whitelabelDebug.entitlements;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -9716,7 +9716,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Whitelabel";
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = podcasts/podcasts.entitlements;
+				CODE_SIGN_ENTITLEMENTS = podcasts/whitelabel.entitlements;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -10251,7 +10251,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Whitelabel";
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = podcasts/podcastsDebug.entitlements;
+				CODE_SIGN_ENTITLEMENTS = podcasts/whitelabelDebug.entitlements;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
