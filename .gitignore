@@ -47,3 +47,7 @@ artifacts/*
 # Claude Code ignored personal preferences
 .claude/settings.local.json
 .claude/worktrees
+
+# Architectural decision records live in the branded private fork,
+# not the public white-label. See plan Stage 6.
+docs/decisions/
