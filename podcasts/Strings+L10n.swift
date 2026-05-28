@@ -4,14 +4,23 @@ import PocketCastsUtils
 extension L10n {
     // MARK: Proper Nouns
 
-    /// These strings are proper nouns and shouldn't be localized
+    /// These strings are proper nouns and shouldn't be localized.
+    ///
+    /// `appleWatch`, `xCom`, and `instagram` reference other companies'
+    /// products and stay literal. `pocketCasts`, `pocketCastsShort`,
+    /// `socialHandle`, and `websiteShort` read from `WhitelabelConfig`
+    /// (in PocketCastsUtils) so a branded build substitutes its own
+    /// values; the white-label default falls back to a generic noun
+    /// rather than emitting an empty string into UI.
     static let appleWatch = "Apple Watch"
-    static let pocketCasts = "Pocket Casts"
-    static let pocketCastsShort = "Casts"
+    static let pocketCasts: String = WhitelabelConfig.brandName.isEmpty
+        ? "Podcasts" : WhitelabelConfig.brandName
+    static let pocketCastsShort: String = WhitelabelConfig.brandNameShort.isEmpty
+        ? "Podcasts" : WhitelabelConfig.brandNameShort
     static let xCom = "X"
     static let instagram = "Instagram"
-    static let socialHandle = "@pocketcasts"
-    static let websiteShort = "pocketcasts.com"
+    static let socialHandle: String = WhitelabelConfig.socialHandle
+    static let websiteShort: String = WhitelabelConfig.websiteShort
 
     // MARK: Support
 
@@ -34,7 +43,14 @@ extension L10n {
     static let supportEmailPlaceholder = "Enter your email"
 
     /* Error message for when the support request fails to process. */
-    static let supportErrorMsg = "Please try again later or you can reach out directly by emailing us at 'support@pocketcasts.com'"
+    /// Composes a fallback message that drops the "email us at X" clause
+    /// when the white-label build has no support email configured.
+    static var supportErrorMsg: String {
+        if WhitelabelConfig.supportEmail.isEmpty {
+            return "Please try again later."
+        }
+        return "Please try again later or you can reach out directly by emailing us at '\(WhitelabelConfig.supportEmail)'"
+    }
 
     /* Error title for when the support request fails to process. */
     static let supportErrorTitle = "Oops something went wrong"
