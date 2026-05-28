@@ -74,6 +74,9 @@ struct Ratings2025Story: ShareableStory {
             )
             Spacer()
             emptyChart
+            // "Learn about ratings" opens blog.pocketcasts.com; hidden in
+            // white-label builds (see WhitelabelConfig network-privacy notes).
+            #if !WHITELABEL
             Button(L10n.learnAboutRatings) {
                 pauseState.togglePause()
                 openURL = true
@@ -81,6 +84,7 @@ struct Ratings2025Story: ShareableStory {
             }
             .buttonStyle(BasicButtonStyle(textColor: .black, backgroundColor: Color.white, borderColor: .white))
             .allowsHitTesting(true)
+            #endif
         }
         .sheet(isPresented: $openURL, onDismiss: {
             pauseState.togglePause()

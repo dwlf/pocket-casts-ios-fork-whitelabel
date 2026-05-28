@@ -28,15 +28,23 @@ class ImportViewModel: OnboardingModel {
     }
 
     // MARK: - Import apps
-    let supportedSources: [ImportSource] = [
-        .init(id: .applePodcasts, displayName: "Apple Podcasts", steps: L10n.importInstructionsApplePodcastsSteps),
-        .init(id: .breaker, displayName: "Breaker", steps: L10n.importInstructionsBreaker),
-        .init(id: .castro, displayName: "Castro", steps: L10n.importInstructionsCastro),
-        .init(id: .castbox, displayName: "Castbox", steps: L10n.importInstructionsCastbox),
-        .init(id: .overcast, displayName: "Overcast", steps: L10n.importInstructionsOvercast),
-        .init(id: .other, displayName: "other apps", steps: FeatureFlag.useFollowNaming.enabled ? L10n.importPodcastsDescriptionNew : L10n.importPodcastsDescription),
-        .init(id: .opmlFromURL, displayName: "URL", steps: L10n.importOpmlFromUrl)
-    ]
+    let supportedSources: [ImportSource] = {
+        var sources: [ImportSource] = []
+        // Apple Podcasts import opens a Pocket Casts web tool; hidden in
+        // white-label builds (see WhitelabelConfig network-privacy notes).
+        #if !WHITELABEL
+        sources.append(.init(id: .applePodcasts, displayName: "Apple Podcasts", steps: L10n.importInstructionsApplePodcastsSteps))
+        #endif
+        sources.append(contentsOf: [
+            .init(id: .breaker, displayName: "Breaker", steps: L10n.importInstructionsBreaker),
+            .init(id: .castro, displayName: "Castro", steps: L10n.importInstructionsCastro),
+            .init(id: .castbox, displayName: "Castbox", steps: L10n.importInstructionsCastbox),
+            .init(id: .overcast, displayName: "Overcast", steps: L10n.importInstructionsOvercast),
+            .init(id: .other, displayName: "other apps", steps: FeatureFlag.useFollowNaming.enabled ? L10n.importPodcastsDescriptionNew : L10n.importPodcastsDescription),
+            .init(id: .opmlFromURL, displayName: "URL", steps: L10n.importOpmlFromUrl)
+        ])
+        return sources
+    }()
 
     enum ImportSourceId: String, AnalyticsDescribable {
         case breaker, castbox = "wazecastbox", overcast, other, opmlFromURL

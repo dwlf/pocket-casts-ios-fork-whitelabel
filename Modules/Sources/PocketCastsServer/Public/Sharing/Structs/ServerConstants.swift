@@ -65,8 +65,8 @@ public enum ServerConstants {
         public static let pocketcastsDotCom = WhitelabelConfig.websiteURL
         // `automatticDotCom` and `automatticWorkWithUs` stay literal —
         // these point at Automattic the company, not at a Pocket Casts
-        // service. White-label callers (AboutView et al.) gate the rows
-        // that use them on WhitelabelConfig.brandName presence.
+        // service. White-label callers (AboutView et al.) compile out the
+        // rows that use them under #if !WHITELABEL.
         public static let automatticDotCom = "https://automattic.com/"
         public static let automatticWorkWithUs = "https://automattic.com/work-with-us/"
         public static let appStore = WhitelabelConfig.appStoreURL

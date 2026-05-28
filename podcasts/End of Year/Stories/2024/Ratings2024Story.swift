@@ -75,6 +75,9 @@ struct Ratings2024Story: ShareableStory {
                 .font(.system(size: 31, weight: .bold))
             Text(L10n.playback2024RatingsEmptyDescription)
                 .font(.system(size: 15, weight: .light))
+            // "Learn about ratings" opens blog.pocketcasts.com; hidden in
+            // white-label builds (see WhitelabelConfig network-privacy notes).
+            #if !WHITELABEL
             Button(L10n.learnAboutRatings) {
                 pauseState.togglePause()
                 openURL = true
@@ -82,6 +85,7 @@ struct Ratings2024Story: ShareableStory {
             }
             .buttonStyle(BasicButtonStyle(textColor: .black, backgroundColor: Color.clear, borderColor: .black))
             .allowsHitTesting(true)
+            #endif
         }
         .minimumScaleFactor(0.5)
         .sheet(isPresented: $openURL, onDismiss: {

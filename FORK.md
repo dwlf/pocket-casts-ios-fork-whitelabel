@@ -154,6 +154,13 @@ so both are gated:
 launches and idles, then fails if any lookup hits a Pocket Casts /
 Automattic host (Stage 4 step 37; requires sudo).
 
+Tap-triggered links that opened upstream hosts are also handled: the
+podcast-page category link routes to `WhitelabelConfig.websiteURL` (no
+link when empty), and the Apple-Podcasts import option, End-of-Year
+ratings "learn more" link, and the About → Automattic-family / Work-
+With-Us / logo sections are compiled out under `#if !WHITELABEL`. These
+fire only on interaction, so they do not affect the idle netcheck.
+
 ## Building a branded fork on top
 
 The branded layer is a separate (typically private) repo with this

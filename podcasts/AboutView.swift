@@ -74,11 +74,11 @@ struct AboutView: View {
                             }
                         }
                         // The Automattic Family, Work With Us, and Automattic-logo
-                        // sections are Pocket-Casts-specific. The white-label default
-                        // (empty WhitelabelConfig.brandName) hides them; branded forks
-                        // that want to show their own family/parent organization can
-                        // re-introduce equivalent sections via their own About view.
-                        if !WhitelabelConfig.brandName.isEmpty {
+                        // sections are Pocket-Casts-specific and link to automattic.com.
+                        // Compiled out of every white-label build (placeholder and
+                        // branded forks alike); a branded fork that wants its own
+                        // family/parent section can add it to its own About view.
+                        #if !WHITELABEL
                             Section {
                                 VStack(alignment: .leading) {
                                     Text(L10n.aboutA8cFamily)
@@ -124,7 +124,7 @@ struct AboutView: View {
                                 }
                             }
                             .listRowBackground(Color.clear)
-                        }
+                        #endif
                     }
                     .colorScheme(theme.activeTheme.isDark ? .dark : .light)
                     .scrollContentBackground(.hidden)
