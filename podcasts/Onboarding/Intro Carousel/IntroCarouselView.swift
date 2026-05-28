@@ -77,9 +77,16 @@ struct IntroCarouselView: View {
                         .frame(height: 40)
                     #endif
 
+                    // Whitelabel builds omit the carousel hero image: the
+                    // upstream asset is a mosaic of recognisable third-party
+                    // podcast cover art (The Daily, Radiolab, etc.) which is
+                    // not safe to ship under a fork's brand. The slide still
+                    // renders the brand header + title + description text.
+                    #if !WHITELABEL
                     Image("intro-carousel-podcasts")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
+                    #endif
                 }
             },
             title: L10n.onboardingQuoteBest.wrapInSmartQuotes(),
@@ -87,6 +94,13 @@ struct IntroCarouselView: View {
         ),
         CarouselItem(
             contentView: {
+                // Whitelabel builds omit the playback-effects hero image:
+                // the upstream asset shows the Pocket Casts player chrome
+                // overlaid on third-party cover art. The slide still renders
+                // its title + description text.
+                #if WHITELABEL
+                EmptyView()
+                #else
                 Image("intro-carousel-effects")
                     .mask(
                         LinearGradient(
@@ -99,15 +113,24 @@ struct IntroCarouselView: View {
                             endPoint: .bottom
                         )
                     )
+                #endif
             },
             title: L10n.onboardingQuoteCustomization.wrapInSmartQuotes(),
             description: L10n.onboardingQuoteAuthor
         ),
         CarouselItem(
             contentView: {
+                // Whitelabel builds omit the folders hero image: the upstream
+                // asset shows the Pocket Casts folders UI populated with
+                // third-party cover art. The slide still renders its
+                // title + description text.
+                #if WHITELABEL
+                EmptyView()
+                #else
                 Image("intro-carousel-folders")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
+                #endif
             },
             title: L10n.onboardingQuoteFolders.wrapInSmartQuotes(),
             description: L10n.onboardingQuoteAuthor

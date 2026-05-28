@@ -219,6 +219,14 @@ A pre-push git hook enforces.
   on the plan to be overlaid by neutral variants under a
   `Whitelabel.*.xcassets` parallel set with
   `EXCLUDED_SOURCE_FILE_NAMES`-driven selection. Not yet wired.
+- Intro onboarding carousel: all three hero images
+  (`intro-carousel-podcasts`, `intro-carousel-effects`,
+  `intro-carousel-folders`) are omitted in whitelabel builds via
+  `#if !WHITELABEL`. The upstream assets render third-party podcast
+  cover art and screenshots of the Pocket Casts player/folders
+  chrome; neither is safe under an independent fork's brand. Slides
+  still render brand header + quote + author attribution; the
+  branded fork is expected to inject its own marketing imagery.
 - `Localizable.strings` brand-stripped at build time (post-Copy
   Bundle Resources phase, via `scripts/strip_brand_strings.py`).
   Reads `MARKETING_NAME` and `WEBSITE_SHORT` from xcconfig and
