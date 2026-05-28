@@ -30,8 +30,10 @@ fastlane/app-localization-downloads/*.lproj
 podcasts/Credentials/LocalApiCredentials.swift
 
 # Generated at build time by scripts/generate_whitelabel_config.sh from
-# podcasts/Whitelabel/WhitelabelConfig.tpl and the active WHITELABEL_CONFIG_JSON.
-podcasts/Whitelabel/WhitelabelConfig.swift
+# Modules/Sources/PocketCastsUtils/General/WhitelabelConfig.tpl and the
+# active WHITELABEL_CONFIG_JSON. Lives in PocketCastsUtils so every target
+# importing PocketCastsUtils gets WhitelabelConfig automatically.
+Modules/Sources/PocketCastsUtils/General/WhitelabelConfig.swift
 
 # SwiftLint Remote Config Cache
 .swiftlint/RemoteConfigCache

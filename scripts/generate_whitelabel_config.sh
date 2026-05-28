@@ -23,8 +23,12 @@ if [[ -z "${SRCROOT:-}" ]]; then
     SRCROOT="$(cd "$(dirname "$0")/.." && pwd)"
 fi
 
-TEMPLATE="$SRCROOT/podcasts/Whitelabel/WhitelabelConfig.tpl"
-OUTPUT="$SRCROOT/podcasts/Whitelabel/WhitelabelConfig.swift"
+# WhitelabelConfig lives in the PocketCastsUtils Swift Package so every
+# target that imports PocketCastsUtils (main app + 4 extensions + TV app +
+# PocketCastsServer module) gets access. The .tpl is committed source of
+# truth; the generated .swift is gitignored and recreated per build.
+TEMPLATE="$SRCROOT/Modules/Sources/PocketCastsUtils/General/WhitelabelConfig.tpl"
+OUTPUT="$SRCROOT/Modules/Sources/PocketCastsUtils/General/WhitelabelConfig.swift"
 DEFAULT_JSON="$SRCROOT/config/whitelabel/whitelabel.json"
 
 JSON_PATH="${WHITELABEL_CONFIG_JSON:-$DEFAULT_JSON}"

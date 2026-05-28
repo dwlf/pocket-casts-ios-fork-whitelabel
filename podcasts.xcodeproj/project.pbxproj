@@ -3001,7 +3001,6 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		7FE43512C334233604B62C6A /* Whitelabel */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Whitelabel; sourceTree = "<group>"; };
 		371E0318452B7C751D0C5611 /* Fingerprint */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Fingerprint; sourceTree = "<group>"; };
 		3F26BB7B2F4FC23E0007119B /* PocketCastsTests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (3F26BBBE2F4FC23E0007119B /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = PocketCastsTests; sourceTree = "<group>"; };
 		3F26BBE52F4FC3090007119B /* WidgetExtension */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (3F26BC052F4FC3090007119B /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = WidgetExtension; sourceTree = "<group>"; };
@@ -3991,7 +3990,6 @@
 				D4DA5CAA1739ED4C003FE24B /* Discovery */,
 				BD55C9F11FB9200C0084A7CB /* Profile */,
 				3F585D252F568CF8005A3593 /* Episode */,
-				7FE43512C334233604B62C6A /* Whitelabel */,
 			);
 			name = "User Interface";
 			sourceTree = "<group>";
@@ -5888,7 +5886,6 @@
 				3F747A532F5553A1004C7FF6 /* Extensions */,
 				3F747A542F5598A2004C7FF6 /* Playback */,
 				3F747A5A2F559925004C7FF6 /* Notifications */,
-				7FE43512C334233604B62C6A /* Whitelabel */,
 			);
 			name = podcasts;
 			packageProductDependencies = (
