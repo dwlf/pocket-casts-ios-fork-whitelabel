@@ -1,13 +1,22 @@
 #!/usr/bin/env python3
 """
 Strip "Pocket Casts" and "pocketcasts.com" from the built .app's
-Localizable.strings, replacing with values from the active Whitelabel
-xcconfig (MARKETING_NAME, WEBSITE_SHORT). Runs as a post-Copy-Bundle-
-Resources Xcode build phase on Whitelabel configurations only.
+localized .strings files, replacing with values from the active
+Whitelabel xcconfig (MARKETING_NAME, WEBSITE_SHORT). Runs as a
+post-Copy-Bundle-Resources Xcode build phase on Whitelabel
+configurations only.
 
-The built .lproj/Localizable.strings files are binary property lists,
-so we read them with plistlib, do the string substitution on each
-value, and write them back in binary format.
+Two file families are processed (both are binary property lists):
+
+    *.lproj/Localizable.strings   user-facing UI copy
+    *.lproj/InfoPlist.strings     system permission prompts and
+                                  bundle/scene names per locale
+
+The English source Info.plist uses $(MARKETING_NAME) substitution
+directly (Xcode preprocesses Info.plist at build time), so the root
+Info.plist is not touched here. Only the localized InfoPlist.strings
+need string-level rewriting because Xcode does not apply build-setting
+substitution inside *.lproj/*.strings files.
 
 The source .strings files in podcasts/<lang>.lproj/ are never touched —
 they stay as upstream so weekly upstream merges remain conflict-free.
@@ -52,7 +61,10 @@ def main():
         print(f"strip_brand_strings: app not found at {app_path}", file=sys.stderr)
         return 1
 
-    lproj_strings = sorted(app_path.glob("*.lproj/Localizable.strings"))
+    lproj_strings = sorted(
+        list(app_path.glob("*.lproj/Localizable.strings"))
+        + list(app_path.glob("*.lproj/InfoPlist.strings"))
+    )
     print(f"strip_brand_strings: app={app_path} brand={brand!r} "
           f"website={website_short!r} files={len(lproj_strings)}")
 

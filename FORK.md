@@ -227,12 +227,22 @@ A pre-push git hook enforces.
   chrome; neither is safe under an independent fork's brand. Slides
   still render brand header + quote + author attribution; the
   branded fork is expected to inject its own marketing imagery.
-- `Localizable.strings` brand-stripped at build time (post-Copy
-  Bundle Resources phase, via `scripts/strip_brand_strings.py`).
-  Reads `MARKETING_NAME` and `WEBSITE_SHORT` from xcconfig and
-  rewrites the built `.lproj/Localizable.strings` binary plists in
-  place. No-ops when `MARKETING_NAME == "Pocket Casts"` so upstream
-  schemes pass through unmodified.
+- `Localizable.strings` and `InfoPlist.strings` brand-stripped at
+  build time (post-Copy Bundle Resources phase, via
+  `scripts/strip_brand_strings.py`). Reads `MARKETING_NAME` and
+  `WEBSITE_SHORT` from xcconfig and rewrites the built
+  `.lproj/Localizable.strings` and `.lproj/InfoPlist.strings`
+  binary plists in place. No-ops when
+  `MARKETING_NAME == "Pocket Casts"` so upstream schemes pass
+  through unmodified.
+- System permission prompts (`NSBluetoothPeripheralUsageDescription`,
+  `NSLocalNetworkUsageDescription`, `NSMicrophoneUsageDescription`,
+  `NSPhotoLibrary{Add}UsageDescription`) in the source
+  `podcasts/podcasts-Info.plist` use `$(MARKETING_NAME)`
+  substitution; Xcode preprocesses Info.plist at build time. The
+  localized InfoPlist.strings translations are rewritten by the
+  strip script above. The label users see on the first permission
+  alert reads "Whitelabel needs to access your microphone…" etc.
 - End-of-Year feature (`podcasts/End of Year/`) excluded from
   whitelabel builds.
 - Alternate app icon picker hidden in whitelabel builds. The 19
