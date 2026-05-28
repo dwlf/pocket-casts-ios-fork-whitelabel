@@ -1,11 +1,12 @@
 import CoreSpotlight
 import Intents
+import PocketCastsUtils
 import MediaPlayer
 import UIKit
 
 class ChapterIntentHandler: NSObject, SJChapterIntentHandling {
     func handle(intent: SJChapterIntent, completion: @escaping (SJChapterIntentResponse) -> Void) {
-        let userActivity = NSUserActivity(activityType: "au.com.shiftyjelly.podcasts")
+        let userActivity = NSUserActivity(activityType: HostBundleIdentifier.value)
         // TODO: we should really open the app to the episode screen
         // Donate as User Activity
         userActivity.isEligibleForSearch = true

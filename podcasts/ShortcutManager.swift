@@ -1,4 +1,5 @@
 import PocketCastsDataModel
+import PocketCastsUtils
 import UIKit
 import Combine
 
@@ -55,7 +56,7 @@ class ShortcutManager: CustomObserver {
         if let topPlaylist = DataManager.sharedManager.allPlaylists(includeDeleted: false).first, let iconName = topPlaylist.iconImageName() {
             shortcutItems.append(
                 UIMutableApplicationShortcutItem(
-                    type: "au.com.shiftyjelly.podcasts",
+                    type: HostBundleIdentifier.value,
                     localizedTitle: topPlaylist.playlistName,
                     localizedSubtitle: "\(DataManager.sharedManager.episodeCount(for: topPlaylist, episodeUuidToAdd: topPlaylist.episodeUuidToAddToQueries())) items",
                     icon: UIApplicationShortcutIcon(templateImageName: iconName),
@@ -69,7 +70,7 @@ class ShortcutManager: CustomObserver {
             if PlaybackManager.shared.playing() {
                 shortcutItems.append(
                     UIMutableApplicationShortcutItem(
-                        type: "au.com.shiftyjelly.podcasts",
+                        type: HostBundleIdentifier.value,
                         localizedTitle: L10n.pause,
                         localizedSubtitle: currentEpisode.displayableTitle(),
                         icon: UIApplicationShortcutIcon(type: .pause),
@@ -79,7 +80,7 @@ class ShortcutManager: CustomObserver {
             } else {
                 shortcutItems.append(
                     UIMutableApplicationShortcutItem(
-                        type: "au.com.shiftyjelly.podcasts",
+                        type: HostBundleIdentifier.value,
                         localizedTitle: L10n.play,
                         localizedSubtitle: currentEpisode.displayableTitle(),
                         icon: UIApplicationShortcutIcon(type: .play),
@@ -91,7 +92,7 @@ class ShortcutManager: CustomObserver {
             // discover
             shortcutItems.append(
                 UIMutableApplicationShortcutItem(
-                    type: "au.com.shiftyjelly.podcasts",
+                    type: HostBundleIdentifier.value,
                     localizedTitle: "Find New Podcasts",
                     localizedSubtitle: nil,
                     icon: UIApplicationShortcutIcon(type: .search),

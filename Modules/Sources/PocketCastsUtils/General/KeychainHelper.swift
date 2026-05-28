@@ -6,7 +6,11 @@ public class KeychainHelper {
         case status(OSStatus)
     }
 
-    private let prefix = "au.com.shiftyjelly.podcasts."
+    // Keychain prefix derives from the host app's bundle ID so the
+    // same keychain entries are visible to the host and to any
+    // extension that calls into KeychainHelper (HostBundleIdentifier
+    // strips known extension suffixes to yield the host's ID).
+    private let prefix = HostBundleIdentifier.value + "."
 
     private static let shared = KeychainHelper()
 

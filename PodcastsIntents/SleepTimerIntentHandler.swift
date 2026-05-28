@@ -1,11 +1,12 @@
 import CoreSpotlight
 import Intents
+import PocketCastsUtils
 import MediaPlayer
 import UIKit
 
 class SleepTimerIntentHandler: NSObject, SJSleepTimerIntentHandling {
     func handle(intent: SJSleepTimerIntent, completion: @escaping (SJSleepTimerIntentResponse) -> Void) {
-        let userActivity = NSUserActivity(activityType: "au.com.shiftyjelly.podcasts")
+        let userActivity = NSUserActivity(activityType: HostBundleIdentifier.value)
 
         userActivity.isEligibleForSearch = true
         let minutes = intent.minutes

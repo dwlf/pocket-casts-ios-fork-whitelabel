@@ -4,7 +4,7 @@
 <dict>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>au.com.shiftyjelly.podcasts.Refresh</string>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER).Refresh</string>
 	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>

@@ -1,11 +1,12 @@
 import CoreSpotlight
 import Intents
+import PocketCastsUtils
 import MediaPlayer
 import UIKit
 
 class PlayMediaIntentHandler: NSObject, INPlayMediaIntentHandling {
     func handle(intent: INPlayMediaIntent, completion: @escaping (INPlayMediaIntentResponse) -> Void) {
-        let userActivity = NSUserActivity(activityType: "au.com.shiftyjelly.podcasts")
+        let userActivity = NSUserActivity(activityType: HostBundleIdentifier.value)
         var trackName = "Playing the top episode"
         if let item = intent.mediaItems?.first, let itemTitle = item.title {
             trackName = itemTitle

@@ -273,6 +273,7 @@ enum XcodeSupport {
             .xcodeTarget(
                 XcodeTargetNames.podcastsIntents,
                 dependencies: [
+                    "PocketCastsUtils",
                     .product(name: "Fuse", package: "fuse-swift"),
                 ]
             ),
