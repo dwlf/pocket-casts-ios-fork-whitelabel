@@ -1,0 +1,42 @@
+// Base xcconfig for the white-label build matrix. Mirrors the structure
+// of PocketCasts.base.xcconfig.
+//
+// Operator-tunable values (PRODUCT_BUNDLE_IDENTIFIER_ROOT, APP_GROUP_ID,
+// MARKETING_NAME, WEBSITE_SHORT, DEVELOPMENT_TEAM) ship as neutral or
+// empty defaults; the private branded fork overrides these in its own
+// Brand.*.xcconfig layer.
+
+#include "Version.xcconfig"
+
+SWIFT_VERSION = 5.0
+
+MARKETING_VERSION = $(VERSION_SHORT)
+CURRENT_PROJECT_VERSION = $(VERSION_LONG)
+
+// Bundle ID root — extensions append .Clip / .watchkitapp / etc.
+PRODUCT_BUNDLE_IDENTIFIER_ROOT = com.example.whitelabel
+
+// App group container — must match $(APP_GROUP_ID) substitution in all
+// .entitlements files.
+APP_GROUP_ID = group.com.example.whitelabel
+
+// User-facing display name. Substituted into Info.plist CFBundleDisplayName
+// and into Localizable.strings at build time (Stage 3).
+MARKETING_NAME = Whitelabel
+
+// Domain shown in About / footer. Substituted into Localizable.strings
+// at build time (Stage 3). Empty default leaves a generic noun in copy.
+WEBSITE_SHORT =
+
+// Source-of-truth JSON for WhitelabelConfig.swift generation. The branded
+// fork overrides this to point at config/brand/<brand>.json.
+WHITELABEL_CONFIG_JSON = $(SRCROOT)/config/whitelabel/whitelabel.json
+
+// Single compile flag for behaviour-level branches the WhitelabelConfig
+// empty-value pattern cannot express (e.g. excluding the Automattic-family
+// analytics adapter wire-up).
+OTHER_SWIFT_FLAGS = $(inherited) -D WHITELABEL
+
+// Dev team intentionally empty in the public white-label. The branded fork
+// supplies its own team via Brand.base.xcconfig.
+DEVELOPMENT_TEAM =

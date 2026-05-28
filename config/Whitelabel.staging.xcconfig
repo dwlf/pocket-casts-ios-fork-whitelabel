@@ -1,0 +1,5 @@
+#include "Whitelabel.base.xcconfig"
+
+PRODUCT_BUNDLE_IDENTIFIER = $(PRODUCT_BUNDLE_IDENTIFIER_ROOT)
+
+OTHER_SWIFT_FLAGS = $(inherited) -D STAGING -D DEBUG

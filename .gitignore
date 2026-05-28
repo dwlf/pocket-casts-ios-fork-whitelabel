@@ -29,6 +29,10 @@ fastlane/app-localization-downloads/*.lproj
 # Do not commit ApiCredentials.swift
 podcasts/Credentials/LocalApiCredentials.swift
 
+# Generated at build time by scripts/generate_whitelabel_config.sh from
+# podcasts/Whitelabel/WhitelabelConfig.tpl and the active WHITELABEL_CONFIG_JSON.
+podcasts/Whitelabel/WhitelabelConfig.swift
+
 # SwiftLint Remote Config Cache
 .swiftlint/RemoteConfigCache
 

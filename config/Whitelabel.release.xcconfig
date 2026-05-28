@@ -1,0 +1,7 @@
+#include "Whitelabel.base.xcconfig"
+
+PRODUCT_BUNDLE_IDENTIFIER = $(PRODUCT_BUNDLE_IDENTIFIER_ROOT)
+
+// PROVISIONING_PROFILE_SPECIFIER intentionally unset for the white-label —
+// the public repo cannot ship Automattic provisioning profile references.
+// Operator supplies signing identity via the branded fork's Brand.release.xcconfig.
