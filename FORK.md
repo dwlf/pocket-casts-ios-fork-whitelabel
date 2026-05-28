@@ -364,6 +364,51 @@ product built on top of this fork:
 - **Brand assets** (logos, fonts, illustrations) are yours and
   carry no license obligation from this fork.
 
+## Gotchas & verification notes
+
+Non-obvious facts worth knowing before working on the decoupling layer.
+
+### Build / architecture
+
+- **`#if WHITELABEL` does not reach the SwiftPM modules.** The
+  `-D WHITELABEL` flag lives in `Whitelabel.base.xcconfig` and applies to
+  the app and extension targets, not to `Modules/Sources/*`
+  (PocketCastsServer, PocketCastsUtils, …). To branch module code by
+  brand, gate at the app-target caller or use a value-based
+  `WhitelabelConfig` check (which works everywhere).
+- **The `pocketcasts` scheme is build-verification only.** Brand values
+  route through `WhitelabelConfig` with empty defaults, so the upstream
+  scheme is not runtime-functional in this fork, and it needs
+  Automattic-internal secrets to build at all. Empty IAP IDs / server
+  URLs there are by design, not a regression.
+- **`#if` is invalid inside a Swift array/collection literal.** Build the
+  array in a closure-initialized `let` and append conditionally instead.
+
+### Verification
+
+- **Simulator white-label builds are ad-hoc signed with empty
+  entitlements** (no `DEVELOPMENT_TEAM`). The signed app-group entitlement
+  cannot be verified on the simulator. Verify instead via each target's
+  Info.plist value, `xcrun simctl get_app_container <dev> <bundle>
+  group.<id>`, and the on-disk shared-container suite.
+- **Enumerate rename/leak sites with the compiler and keyword sweeps, not
+  file-name scoping.** `for f in $(rg -l …)` word-splits on spaces in
+  paths, and scoping a sweep to files that name a type misses
+  inference-typed usages. Use `rg -l … -0 | while IFS= read -r -d '' f`
+  and let the build report the rest.
+- **Treat audits as bug-finding, not rubber-stamping.** The Stage 4
+  network audit surfaced the `TracksAdapter` ExPlat leak and an inverted
+  `brandName` About-section gate; budget for fixes, not just a green pass.
+
+### Tooling
+
+- **`gh` defaults to the `upstream` (Automattic) remote** in this
+  multi-remote repo. Always pass `--repo dwlf/pocket-casts-ios-fork-whitelabel`
+  for issues, or work lands on the wrong tracker. The configured PAT can
+  create issues but not comment on them.
+- **`docs/decisions/` is gitignored** — decision records placed there are
+  not committed. Durable notes go in this file.
+
 ## Known issues
 
 [`docs/known-issues.md`](docs/known-issues.md), including the
