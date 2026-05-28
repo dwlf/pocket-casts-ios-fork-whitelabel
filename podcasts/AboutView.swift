@@ -73,51 +73,58 @@ struct AboutView: View {
                                 showLegalAndMore = true
                             }
                         }
-                        Section {
-                            VStack(alignment: .leading) {
-                                Text(L10n.aboutA8cFamily)
-                                    .textStyle(PrimaryText())
-                                    .padding(.top, familyCellTopPadding)
-                                GeometryReader { geometry in
-                                    HStack(alignment: .bottom) {
-                                        ForEach(Array(AboutLogo.allCases.enumerated()), id: \.element) { index, logo in
-                                            LogoView(logo: logo, index: index, logoSize: calculateLogoSize(geometry: geometry), logoOffset: logoOffsetAmount)
+                        // The Automattic Family, Work With Us, and Automattic-logo
+                        // sections are Pocket-Casts-specific. The white-label default
+                        // (empty WhitelabelConfig.brandName) hides them; branded forks
+                        // that want to show their own family/parent organization can
+                        // re-introduce equivalent sections via their own About view.
+                        if !WhitelabelConfig.brandName.isEmpty {
+                            Section {
+                                VStack(alignment: .leading) {
+                                    Text(L10n.aboutA8cFamily)
+                                        .textStyle(PrimaryText())
+                                        .padding(.top, familyCellTopPadding)
+                                    GeometryReader { geometry in
+                                        HStack(alignment: .bottom) {
+                                            ForEach(Array(AboutLogo.allCases.enumerated()), id: \.element) { index, logo in
+                                                LogoView(logo: logo, index: index, logoSize: calculateLogoSize(geometry: geometry), logoOffset: logoOffsetAmount)
+                                            }
                                         }
+                                        .offset(y: logoCellHeight - logoOffsetAmount - calculateLogoSize(geometry: geometry) + familyCellTopPadding)
                                     }
-                                    .offset(y: logoCellHeight - logoOffsetAmount - calculateLogoSize(geometry: geometry) + familyCellTopPadding)
+                                    .frame(height: logoCellHeight)
                                 }
-                                .frame(height: logoCellHeight)
+                                .frame(height: familyCellHeight)
+                                .onTapGesture {
+                                    model.track(action: .automatticFamily)
+                                    openUrl(ServerConstants.Urls.automatticDotCom)
+                                }
                             }
-                            .frame(height: familyCellHeight)
-                            .onTapGesture {
-                                model.track(action: .automatticFamily)
-                                openUrl(ServerConstants.Urls.automatticDotCom)
+                            .listRowBackground(ThemeColor.primaryUi02(for: theme.activeTheme).color)
+                            Section {
+                                VStack(alignment: .leading) {
+                                    Text(L10n.aboutWorkWithUs)
+                                        .textStyle(PrimaryText())
+                                    Text(L10n.aboutJoinFromAnywhere)
+                                        .textStyle(SecondaryText())
+                                        .font(.subheadline)
+                                }
+                                .onTapGesture {
+                                    model.track(action: .workWithUs)
+                                    openUrl(ServerConstants.Urls.automatticWorkWithUs)
+                                }
                             }
+                            .listRowBackground(ThemeColor.primaryUi02(for: theme.activeTheme).color)
+                            Section {
+                                HStack {
+                                    Spacer()
+                                    Image("automattic-logo")
+                                        .tint(theme.activeTheme.isDark ? .white : .black)
+                                    Spacer()
+                                }
+                            }
+                            .listRowBackground(Color.clear)
                         }
-                        .listRowBackground(ThemeColor.primaryUi02(for: theme.activeTheme).color)
-                        Section {
-                            VStack(alignment: .leading) {
-                                Text(L10n.aboutWorkWithUs)
-                                    .textStyle(PrimaryText())
-                                Text(L10n.aboutJoinFromAnywhere)
-                                    .textStyle(SecondaryText())
-                                    .font(.subheadline)
-                            }
-                            .onTapGesture {
-                                model.track(action: .workWithUs)
-                                openUrl(ServerConstants.Urls.automatticWorkWithUs)
-                            }
-                        }
-                        .listRowBackground(ThemeColor.primaryUi02(for: theme.activeTheme).color)
-                        Section {
-                            HStack {
-                                Spacer()
-                                Image("automattic-logo")
-                                    .tint(theme.activeTheme.isDark ? .white : .black)
-                                Spacer()
-                            }
-                        }
-                        .listRowBackground(Color.clear)
                     }
                     .colorScheme(theme.activeTheme.isDark ? .dark : .light)
                     .scrollContentBackground(.hidden)
