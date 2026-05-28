@@ -1,97 +1,87 @@
-<p align="center">
-    <!-- Pocket Casts brand image -->
-    <img src="https://user-images.githubusercontent.com/308331/194037473-41ad7eba-8602-4be5-be73-49e3c0c48c12.svg#gh-light-mode-only" />
-    <img src="https://user-images.githubusercontent.com/308331/194041226-4c6d8181-cafa-4ea8-8735-1d8106f5e5f6.svg#gh-dark-mode-only" />
-</p>
+# White-label Pocket Casts fork -- pre-authorized and unaffiliated
 
-<p align="center">
-    <!-- Badge: "build: {trunk CI status}" -->
-    <a href="https://buildkite.com/automattic/pocket-casts-ios"><img src="https://badge.buildkite.com/6c995de3d1584006341cc4dfda1312619f375385f5c0319dfe.svg?branch=trunk" /></a>
-    <!-- Badge: "license: MPL" -->
-    <a href="https://github.com/Automattic/pocket-casts-ios/blob/trunk/LICENSE.md"><img src="https://img.shields.io/badge/license-MPL-black" /></a>
-    <!-- Badge: "platform: ios|watchos" -->
-    <img src="https://img.shields.io/badge/platform-ios%20%7C%20watchos-lightgrey" />
-    <!-- Badge: "Xcode: {version}+" -->
-    <img src="https://img.shields.io/badge/Xcode-v26.1.1%2B-informational" />
-</p>
+> **Not affiliated with, endorsed by, or sponsored by Automattic, Inc.
+> or Pocket Casts.** This is an independent fork of the open-source
+> [pocket-casts-ios](https://github.com/Automattic/pocket-casts-ios)
+> codebase, used under MPL-2.0. "Pocket Casts" and the Pocket Casts
+> logo are trademarks of Automattic, Inc.; their use in this
+> repository is limited to factual references to the upstream project
+> from which this fork derives.
 
-<p align="center">
-    Pocket Casts is the world's most powerful podcast platform, an app by listeners, for listeners.
-</p>
+An iOS podcast player. Brand- and integration-stripped fork of
+pocket-casts-ios.
 
-## Setup
+[![License: MPL-2.0](https://img.shields.io/badge/license-MPL--2.0-black)](LICENSE.md)
+![Platform](https://img.shields.io/badge/platform-ios%20%7C%20watchos-lightgrey)
+![Xcode](https://img.shields.io/badge/Xcode-26.4%2B-informational)
 
-If you don't already have it, you need to install Bundler:
+## What this is
 
-`gem install bundler`
+The full pocket-casts-ios codebase with all Pocket Casts/Automattic
+branding, server endpoints, and credentials extracted to a config
+layer. Build it as-is and you get an installable iOS app that plays
+local audio. Plug in your own server URLs and brand assets via
+`config/whitelabel/whitelabel.json` and the same code talks to your
+infrastructure with your branding.
 
-Next you'll need to install all the dependencies needed for [_fastlane_](https://docs.fastlane.tools/) using this script:
+Swift sources are unchanged from upstream wherever possible — brand
+and server values are read through a generated `WhitelabelConfig`
+struct, not hard-coded.
 
-`make install_dependencies`
+## What this is not
 
-## External contributors
+- **A working podcast cloud service.** The app launches and plays
+  local audio. Cross-device sync, account login, the Discover feed,
+  podcast search, sharing, and IAP/subscription features no-op
+  until you supply a backend that speaks the Pocket Casts server
+  protocol.
+- **A drop-in replacement for Pocket Casts.** Bundle ID, signing
+  identity, and all user-facing branding are yours to supply.
 
-If you're an external contributor run `make external_contributor`. After that you should be able to build and run the project.
+## Relationship to upstream
 
-## Swift Formatting
+- Upstream: <https://github.com/Automattic/pocket-casts-ios> (`trunk`)
+- Upstream's original README is preserved verbatim at
+  [`README.upstream.md`](README.upstream.md) for provenance.
+- This fork tracks upstream `trunk` on a weekly merge cadence.
 
-We use [SwiftLint](https://github.com/realm/SwiftLint) to ensure code is spaced and formatted the same way and follows the same [general conventions](https://github.com/Automattic/swiftlint-config). We have a script that will run it over the whole project.
+## Prerequisites
 
-Once the required dependencies are installed via `bundle exec pod install`, you can run:
+- macOS (tested on 26.5)
+- Xcode 26.4+ at `/Applications/Xcode.app`
+- iOS 26 + watchOS 26 simulator runtimes
+- Ruby 3.2.2 with `bundler`
+- `make`
 
-`make format`
+First-clone setup gotchas (including the SwiftPM keychain hang on
+SwiftGen artifact downloads):
+[`docs/known-issues.md`](docs/known-issues.md).
 
-You should do this before making a pull request.
+## Quick start
 
-## Running
+```bash
+# One-time per machine
+sudo xcodebuild -runFirstLaunch
+xcodebuild -downloadPlatform iOS
+xcodebuild -downloadPlatform watchOS
 
-Open the `.xcodeproj` file, select the Pocket Casts project and the Simulator Device you want to run on, and hit the play button.
+# One-time per clone
+make install_dependencies
+make external_contributor
 
-## Localization
-
-You can learn more about localization at [docs/Localization.md](./docs/localization.md)
-
-## Protocol Buffers
-
-The app uses [Google Protocol Buffers](https://developers.google.com/protocol-buffers) to define our server objects.
-
-To update server objects you'll need to install the protobuf command line tool as well as the [Swift Protobuf](https://github.com/apple/swift-protobuf) translators. This can be done via Homebrew with:
-
+# Build the whitelabel for simulator
+make build_whitelabel
 ```
-brew install protobuf
-brew install swift-protobuf
-```
 
-To update the protobuf files you can then run:
+## More
 
-Replace the `{API_PATH}` with the full path to the `pocketcasts-api/api/modules/protobuf/src/main/proto` folder
+- **[FORK.md](FORK.md)** — fork architecture, configuration keys,
+  upstream-sync workflow, how to build a branded product on top,
+  PR-scope discipline. Read this before contributing.
+- [`README.upstream.md`](README.upstream.md) — upstream's original
+  README, preserved verbatim.
 
-```
-make update_proto API_PATH={API_PATH}
-```
+## License
 
-## Debugging
-
-### Logs
-
-Logs can be found in the app as a view and shared from there through the system sheet or mail:
-* Profile > Help & Feedback > ⋯ > Logs
-
-When debugging analytics, the `tracksLogging` feature flag will enable logging for these events.
-
-### Export Files
-
-An export can be created with the database, settings plist, and logs for debugging purposes:
-* Profile > Help & Feedback > ⋯ > Export Database - the export will include all log files and settings
-* Profile > Settings > Developer > Export Bundle
-
-These exports can also be imported to the app, replacing the database and settings with the ones from the file. This will prompt the user before replacement.
-* Open the file with Pocket Casts directly from Files
-* Drag and drop the file on the Simulator
-* Profile > Settings > Developer > Import Bundle
-
-### Crash Log Symbolication
-
-All [releases](https://github.com/Automattic/pocket-casts-ios/releases) include dSYMs inside of the `xcarchive` file.
-
-These can be used along with the [MacSymbolicator](https://github.com/inket/MacSymbolicator) app to symbolicate any crash logs.
+[MPL-2.0](LICENSE.md), inherited from upstream.
+[`FORK.md`](FORK.md) covers the implications when building on top.
