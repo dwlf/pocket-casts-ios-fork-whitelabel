@@ -10,4 +10,9 @@ CURRENT_PROJECT_VERSION = $(VERSION_LONG)
 // Define a root bundle identifier so that extensions can append to it
 PRODUCT_BUNDLE_IDENTIFIER_ROOT = au.com.shiftyjelly.podcasts
 
+// User-facing display name. Substituted into Info.plist
+// CFBundleDisplayName + CFBundleName via $(MARKETING_NAME) so the
+// Whitelabel xcconfig can override without forking podcasts-Info.plist.
+MARKETING_NAME = Pocket Casts
+
 DEVELOPMENT_TEAM = PZYM8XX95Q // Automattic, Inc. (Company)

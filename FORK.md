@@ -199,6 +199,12 @@ A pre-push git hook enforces.
   `Bundle.main.bundleIdentifier`.
 - App-group ID derived from xcconfig (`APP_GROUP_ID`) with
   `.entitlements` files using `$(APP_GROUP_ID)` substitution.
+- `CFBundleDisplayName` and `CFBundleName` in
+  `podcasts/podcasts-Info.plist` substituted via `$(MARKETING_NAME)`.
+  `MARKETING_NAME` defaults to `Pocket Casts` in
+  `PocketCasts.base.xcconfig` (preserves upstream) and to
+  `Whitelabel` in `Whitelabel.base.xcconfig`. The label users see
+  under the home-screen icon swaps with the active scheme.
 - App icon: neutral "Whitelabel" wordmark on dark slate, sitting
   inline as `AppIcon-Whitelabel.appiconset/` inside the existing
   `podcasts/AppIcon.xcassets/` catalog. The three Whitelabel
