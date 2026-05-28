@@ -134,6 +134,26 @@ either no-op silently or show a neutral empty state (e.g. the
 Discover tab renders "no discover feed configured" rather than
 making a network call to a missing host).
 
+### Network privacy
+
+White-label builds must not phone home to Automattic. Two analytics
+paths reach Automattic hosts independent of the configurable backend,
+so both are gated:
+
+- **Automattic Tracks / ExPlat** — `TracksAdapter` fires an ExPlat
+  experiment fetch on init and streams events to Automattic. It is
+  excluded from the analytics adapter list under `-D WHITELABEL`
+  (`AppDelegate+Analytics.swift`). The remaining adapters are local
+  logging and Sentry crash logging.
+- **Sentry** — disabled by an empty `ApiCredentials.sentryDSN`.
+
+`LiveAnalyticsStreamer` only transmits to a server-supplied
+`liveAnalyticsUrl`; with no backend it is never given one.
+
+`scripts/whitelabel-netcheck.sh` captures DNS while the built app
+launches and idles, then fails if any lookup hits a Pocket Casts /
+Automattic host (Stage 4 step 37; requires sudo).
+
 ## Building a branded fork on top
 
 The branded layer is a separate (typically private) repo with this

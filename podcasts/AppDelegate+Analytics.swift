@@ -16,7 +16,16 @@ extension AppDelegate {
 
         // Only setup if protected data is available, the user hasn't opted out, and we aren't already registered
         if !Settings.analyticsOptOut() {
+            // The Automattic Tracks adapter streams events (and fires an
+            // ExPlat experiment fetch on init) to Automattic hosts that are
+            // independent of the configurable backend. White-label builds
+            // must not phone home to Automattic, so the adapter is excluded
+            // there per the -D WHITELABEL contract in Whitelabel.base.xcconfig.
+            #if WHITELABEL
+            adapters = [AnalyticsLoggingAdapter(), CrashLoggingAdapter()]
+            #else
             adapters = [AnalyticsLoggingAdapter(), TracksAdapter(), CrashLoggingAdapter()]
+            #endif
         }
 
         // LiveAnalyticsStreamer buffers events for all builds, sends when server enables liveAnalyticsUrl
