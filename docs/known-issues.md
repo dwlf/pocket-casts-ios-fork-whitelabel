@@ -68,6 +68,33 @@ xcodebuild -downloadPlatform watchOS
 
 The downloads work without `sudo`.
 
+## `plutil -extract` overwrites the input file
+
+**Symptom.** After running a diagnostic like
+`plutil -extract CFBundleIdentifier raw "$APP/Info.plist"` against a
+built app's Info.plist, the file shrinks to a single value and the
+rest of the keys disappear. Subsequent builds and runs may behave
+strangely until a `make clean` + rebuild restores the file.
+
+**Cause.** `plutil -extract` without an explicit `-o -` (stdout) or
+`-o <other-path>` writes the extracted value **back to the input
+file**, replacing the whole Info.plist with the extracted fragment.
+This is documented but easy to miss; many introductions to plutil
+show `-extract … raw` examples without the output redirect.
+
+**Workaround.** Always pass `-o -` to send extraction to stdout:
+
+```bash
+# Safe:
+plutil -extract CFBundleIdentifier raw -o - "$APP/Info.plist"
+
+# Even safer: use plutil -p for read-only inspection
+plutil -p "$APP/Info.plist" | grep CFBundleIdentifier
+```
+
+`plutil -p` is purely read-only and is the right tool for build
+verification scripts.
+
 ## Xcode license / xcode-select / first-launch components
 
 **Symptom.** `xcodebuild` fails with one of:
