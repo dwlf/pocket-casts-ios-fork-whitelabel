@@ -80,8 +80,13 @@ class NowPlayingHelper {
         }
 
         if let episode = episode as? Episode, let parentPodcast = episode.parentPodcast() {
-            // some car stereo's do weird things with the % character, so here we replace it with pct to work around those bugs
-            let safeCharacterPodcastTitle = parentPodcast.title?.replacingOccurrences(of: "%", with: "pct") ?? "Pocket Casts"
+            // some car stereo's do weird things with the % character, so here we replace it with pct to work around those bugs.
+            // The fallback identifies the app to a car stereo when the parent podcast has no title; resolves to the
+            // operator-configured brand name, then the app's display name, then a generic noun.
+            let brandFallback = WhitelabelConfig.brandName.isEmpty
+                ? (Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? "Podcasts")
+                : WhitelabelConfig.brandName
+            let safeCharacterPodcastTitle = parentPodcast.title?.replacingOccurrences(of: "%", with: "pct") ?? brandFallback
 
             nowPlayingInfo[MPMediaItemPropertyArtist] = safeCharacterPodcastTitle as NSString
             nowPlayingInfo[MPMediaItemPropertyComposer] = safeCharacterPodcastTitle as NSString
