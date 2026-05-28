@@ -76,7 +76,7 @@ class PlusPricingInfoModel: ObservableObject {
 
         let basePrice: Double
 
-        var id: String { identifier.rawValue }
+        var id: String { identifier.productId }
     }
 
     enum ProductOfferType {

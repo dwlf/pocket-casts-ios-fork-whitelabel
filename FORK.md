@@ -85,8 +85,14 @@ auto-includes the generated `.swift` in the module's compile sources.
 | `podcasts/LogsView.swift` | Support email |
 | `podcasts/LegalAndMoreView.swift`, `OnlineSupportController.swift`, `StatusPageViewModel.swift` | Support / legal URLs |
 
-The IAP refactor restructures `IAPProductID` from a raw-value enum
-to a struct (raw-value enums require compile-time strings).
+The IAP refactor drops the `String` raw backing from `IAPProductID`
+and `IAPPromotionID` (raw-value enums require compile-time literals).
+The cases stay — the plan set is fixed across brands — and each gains
+a computed `productId` sourced from `WhitelabelConfig`, plus a failable
+`init?(productId:)` for the store-string reverse lookup. An empty
+config id makes every lookup fail, disabling subscription flows per the
+config's empty-default contract. Keeping the enum preserves the
+exhaustive switches on plan semantics (tier, frequency).
 
 ### What is *not* read from `WhitelabelConfig`
 

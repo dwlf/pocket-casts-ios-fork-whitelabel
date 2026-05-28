@@ -58,7 +58,7 @@ class IAPHelper: NSObject {
 
     /// Requests the product info if we're not checking already, and the products we have already are different
     func requestProductInfoIfNeeded() {
-        let isMissingProducts = productsArray.isEmpty || productsArray.map { $0.productIdentifier } == productIdentifiers.map { $0.rawValue }
+        let isMissingProducts = productsArray.isEmpty || productsArray.map { $0.productIdentifier } == productIdentifiers.map { $0.productId }
 
         guard isMissingProducts, !isRequestingProducts else {
             return
@@ -72,7 +72,7 @@ class IAPHelper: NSObject {
         guard !isRequestingProducts else { return }
 
         isRequestingProducts = true
-        let request = SKProductsRequest(productIdentifiers: Set(productIdentifiers.map { $0.rawValue }))
+        let request = SKProductsRequest(productIdentifiers: Set(productIdentifiers.map { $0.productId }))
         request.delegate = self
         request.start()
     }
@@ -88,7 +88,7 @@ class IAPHelper: NSObject {
         }
 
         for p in productsArray {
-            if p.productIdentifier.caseInsensitiveCompare(identifier.rawValue) == .orderedSame {
+            if p.productIdentifier.caseInsensitiveCompare(identifier.productId) == .orderedSame {
                 return p
             }
         }
@@ -427,7 +427,7 @@ extension IAPHelper {
     }
 
     private func checkTrialEligibility(for productID: IAPProductID) async -> Bool? {
-        guard let products = try? await Product.products(for: [productID.rawValue]) else {
+        guard let products = try? await Product.products(for: [productID.productId]) else {
             return nil
         }
         guard let product = products.first, let renewableSubscription = product.subscription else {
@@ -495,21 +495,21 @@ extension IAPHelper: SKPaymentTransactionObserver {
         if FeatureFlag.newOfferEligibilityCheck.enabled {
             updateTrialEligibility()
         }
-        guard let productId = IAPProductID(rawValue: payment.productIdentifier) else {
+        guard let productId = IAPProductID(productId: payment.productIdentifier) else {
             return
         }
         trackPaymentEvent(.purchaseSuccessful, productId: productId, discount: payment.paymentDiscount?.identifier)
     }
 
     fileprivate func purchaseWasCancelled(_ payment: SKPayment, error: NSError) {
-        guard let productId = IAPProductID(rawValue: payment.productIdentifier) else {
+        guard let productId = IAPProductID(productId: payment.productIdentifier) else {
             return
         }
         trackPaymentEvent(.purchaseCancelled, productId: productId, discount: payment.paymentDiscount?.identifier, error: error)
     }
 
     fileprivate func purchaseFailed(_ payment: SKPayment, error: NSError) {
-        guard let productId = IAPProductID(rawValue: payment.productIdentifier) else {
+        guard let productId = IAPProductID(productId: payment.productIdentifier) else {
             return
         }
         trackPaymentEvent(.purchaseFailed, productId: productId, discount: payment.paymentDiscount?.identifier, error: error)
@@ -518,7 +518,7 @@ extension IAPHelper: SKPaymentTransactionObserver {
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         FileLog.shared.addMessage("IAPHelper number of transactions in SKPayemntTransaction queue    \(transactions.count)")
         var hasNewPurchasedReceipt = false
-        let lowercasedProductIdentifiers = productIdentifiers.map { $0.rawValue.lowercased() }
+        let lowercasedProductIdentifiers = productIdentifiers.map { $0.productId.lowercased() }
 
         for transaction in transactions {
             let product = transaction.payment.productIdentifier
@@ -659,12 +659,12 @@ private extension IAPHelper {
         if let discount {
             if discount.contains(".\(IAPOfferType.winback.rawValue).") {
                 offerType = IAPOfferType.winback.rawValue
-            } else if discount == IAPPromotionID.referall.rawValue {
+            } else if discount == IAPPromotionID.referall.productId {
                 offerType = IAPOfferType.referral.rawValue
             }
         }
 
-        var properties: [AnyHashable: Any] = ["product": productId.rawValue,
+        var properties: [AnyHashable: Any] = ["product": productId.productId,
                                               "offer_type": offerType,
                                               "tier": productId.subscriptionTier.rawValue.lowercased(),
                                               "frequency": productId.frequency.rawValue]

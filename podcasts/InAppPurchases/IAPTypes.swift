@@ -1,11 +1,36 @@
 import Foundation
+import PocketCastsUtils
 
-enum IAPProductID: String {
-    case yearly = "com.pocketcasts.plus.yearly"
-    case monthly = "com.pocketcasts.plus.monthly"
-    case patronYearly = "com.pocketcasts.patron_yearly"
-    case patronMonthly = "com.pocketcasts.patron_monthly"
-    case yearlyReferral = "com.pocketcasts.plus.yearly.referral"
+enum IAPProductID: CaseIterable {
+    case yearly
+    case monthly
+    case patronYearly
+    case patronMonthly
+    case yearlyReferral
+
+    /// App Store product identifier, sourced from the white-label config.
+    /// An empty (unconfigured) id makes `init(productId:)` reject every
+    /// lookup, disabling subscription flows — matching the config's
+    /// empty-default "IAP disabled" contract.
+    var productId: String {
+        switch self {
+        case .yearly: return WhitelabelConfig.iapPlusYearly
+        case .monthly: return WhitelabelConfig.iapPlusMonthly
+        case .patronYearly: return WhitelabelConfig.iapPatronYearly
+        case .patronMonthly: return WhitelabelConfig.iapPatronMonthly
+        case .yearlyReferral: return WhitelabelConfig.iapPlusYearlyReferral
+        }
+    }
+
+    /// Reverse lookup from a store product identifier. Returns nil for an
+    /// empty or unrecognised id (e.g. when IAP is unconfigured).
+    init?(productId: String) {
+        guard !productId.isEmpty,
+              let match = Self.allCases.first(where: { $0.productId == productId }) else {
+            return nil
+        }
+        self = match
+    }
 
     var renewalPrompt: String {
         switch self {
@@ -26,8 +51,14 @@ enum IAPProductID: String {
     }
 }
 
-enum IAPPromotionID: String {
-    case referall = "com.pocketcasts.plus.yearly.referral.promo"
+enum IAPPromotionID {
+    case referall
+
+    /// App Store promotional-offer identifier, sourced from the
+    /// white-label config (empty when IAP is unconfigured).
+    var productId: String {
+        WhitelabelConfig.iapReferralPromo
+    }
 }
 
 enum IAPOfferType: String {

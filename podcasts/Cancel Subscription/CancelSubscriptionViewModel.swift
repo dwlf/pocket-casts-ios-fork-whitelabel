@@ -147,7 +147,7 @@ extension CancelSubscriptionViewModel {
         guard let iap = winbackOffer?.details?.iap else {
             return nil
         }
-        return IAPProductID(rawValue: iap)
+        return IAPProductID(productId: iap)
     }
 
     private func makeDiscountInfo() -> IAPDiscountInfo? {

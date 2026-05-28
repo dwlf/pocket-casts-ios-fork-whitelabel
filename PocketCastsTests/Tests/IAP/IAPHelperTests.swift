@@ -54,7 +54,7 @@ final class IAPHelperTests: XCTestCase {
 
         wait(for: ServerNotifications.iapPurchaseCompleted, timeout: iapTestTimeout, description: "Buy Products")
 
-        XCTAssertEqual(session.allTransactions().first?.productIdentifier, IAPProductID.monthly.rawValue)
+        XCTAssertEqual(session.allTransactions().first?.productIdentifier, IAPProductID.monthly.productId)
     }
  */
 }

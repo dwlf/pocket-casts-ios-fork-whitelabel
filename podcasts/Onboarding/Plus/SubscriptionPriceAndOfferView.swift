@@ -27,7 +27,7 @@ struct SubscriptionPriceAndOfferView: View {
             OfferStack {
                 SubscriptionBadge(tier: product.identifier.subscriptionTier)
                     .transition(.identity.animation(.none))
-                    .id("sub_badge_" + product.identifier.rawValue)
+                    .id("sub_badge_" + product.identifier.productId)
 
                 if let offerDescription = offerDescription(for: product) {
                     Text(offerDescription)

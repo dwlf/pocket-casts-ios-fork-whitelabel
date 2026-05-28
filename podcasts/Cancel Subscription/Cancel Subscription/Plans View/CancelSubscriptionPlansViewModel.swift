@@ -15,7 +15,7 @@ class CancelSubscriptionPlansViewModel: CancelSubscriptionViewModel {
 
     override func handleNext() {
         if let currentPricingProduct, let previousPricingProductID {
-            Analytics.track(.winbackAvailablePlansNewPlanPurchaseSuccessful, properties: ["current_product": previousPricingProductID, "new_product": currentPricingProduct.identifier.rawValue])
+            Analytics.track(.winbackAvailablePlansNewPlanPurchaseSuccessful, properties: ["current_product": previousPricingProductID, "new_product": currentPricingProduct.identifier.productId])
             self.previousPricingProductID = nil
         } else {
             Analytics.track(.winbackAvailablePlansNewPlanPurchaseSuccessful)
@@ -53,7 +53,7 @@ class CancelSubscriptionPlansViewModel: CancelSubscriptionViewModel {
             currentProductAvailability = .loading
         }
         if let transaction = await purchaseHandler.findLastSubscriptionPurchased(),
-           let productID = IAPProductID(rawValue: transaction.productID) {
+           let productID = IAPProductID(productId: transaction.productID) {
             await MainActor.run {
                 lastPurchasedProductID = productID
                 currentProductAvailability = .available
@@ -68,12 +68,12 @@ class CancelSubscriptionPlansViewModel: CancelSubscriptionViewModel {
     }
 
     func purchase(product: PlusPricingInfoModel.PlusProductPricingInfo) {
-        Analytics.track(.winbackAvailablePlansSelectPlan, properties: ["product": product.identifier.rawValue])
+        Analytics.track(.winbackAvailablePlansSelectPlan, properties: ["product": product.identifier.productId])
 
         currentPricingProduct = product
 
         if currentPricingProduct?.identifier != lastPurchasedProductID {
-            previousPricingProductID = lastPurchasedProductID?.rawValue
+            previousPricingProductID = lastPurchasedProductID?.productId
             purchase(product: product.identifier)
         }
     }
