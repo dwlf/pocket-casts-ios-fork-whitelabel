@@ -199,11 +199,20 @@ A pre-push git hook enforces.
   `Bundle.main.bundleIdentifier`.
 - App-group ID derived from xcconfig (`APP_GROUP_ID`) with
   `.entitlements` files using `$(APP_GROUP_ID)` substitution.
-- Asset catalogs (`AppIcon`, `Onboarding`, `Subscription`, etc.)
-  overlaid by neutral variants under a `Whitelabel.*.xcassets`
-  parallel set. Selection per build configuration via
-  `EXCLUDED_SOURCE_FILE_NAMES`. (Stage 3 work; the configurations
-  exist but the asset overlay isn't wired yet.)
+- App icon: neutral "Whitelabel" wordmark on dark slate, sitting
+  inline as `AppIcon-Whitelabel.appiconset/` inside the existing
+  `podcasts/AppIcon.xcassets/` catalog. The three Whitelabel
+  configurations (`WhitelabelDebug`, `WhitelabelRelease`,
+  `WhitelabelStagingDebug`) on the main iOS app target set
+  `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon-Whitelabel` in
+  `project.pbxproj`; upstream schemes continue to resolve `AppIcon`.
+  Source PNG is reproducible via
+  `python3 scripts/generate_whitelabel_appicon.py`. The watch app,
+  App Clip, and TV app icons are untouched (out of Stage 3 scope).
+- Other asset catalogs (`Onboarding`, `Subscription`, etc.) remain
+  on the plan to be overlaid by neutral variants under a
+  `Whitelabel.*.xcassets` parallel set with
+  `EXCLUDED_SOURCE_FILE_NAMES`-driven selection. Not yet wired.
 - `Localizable.strings` brand-stripped at build time (post-Copy
   Bundle Resources phase, via `scripts/strip_brand_strings.py`).
   Reads `MARKETING_NAME` and `WEBSITE_SHORT` from xcconfig and

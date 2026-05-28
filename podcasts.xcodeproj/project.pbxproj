@@ -9179,7 +9179,7 @@
 		46C385F32FC814A800ACB5BE /* WhitelabelDebug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Whitelabel";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = podcasts/podcastsDebug.entitlements;
 				ENABLE_BITCODE = NO;
@@ -9714,7 +9714,7 @@
 		46C386022FC814C200ACB5BE /* WhitelabelRelease */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Whitelabel";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = podcasts/podcastsDebug.entitlements;
 				ENABLE_BITCODE = NO;
@@ -10249,7 +10249,7 @@
 		46C386112FC814C700ACB5BE /* WhitelabelStagingDebug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Whitelabel";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = podcasts/podcastsDebug.entitlements;
 				ENABLE_BITCODE = NO;
