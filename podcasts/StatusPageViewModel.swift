@@ -27,46 +27,78 @@ class StatusPageViewModel: ObservableObject {
         }
     }
 
-    var checks = [
-        Service(
-            title: L10n.settingsStatusInternet,
-            description: L10n.settingsStatusInternetDescription,
-            failureMessage: L10n.settingsStatusInternetFailureMessage
-        ),
-        Service(
-            title: L10n.settingsStatusExpensiveNetwork,
-            description: L10n.settingsStatusExpensiveNetworkDescription,
-            failureMessage: L10n.settingsStatusExpensiveNetworkFailureMessage,
-            customTest: {
-                NetworkUtils.shared.isConnectedToUnexpensiveConnection()
-            }
-        ),
-        Service(
-            title: L10n.settingsStatusRefreshService,
-            description: L10n.settingsStatusRefreshServiceDescription,
-            failureMessage: L10n.settingsStatusServiceAdBlockerHelpSingular("refresh.pocketcasts.com"),
-            urls: ["https://refresh.pocketcasts.com/health.html"]
-        ),
-        Service(
-            title: L10n.settingsStatusAccountService,
-            description: L10n.settingsStatusAccountServiceDescription,
-            failureMessage: L10n.settingsStatusServiceAdBlockerHelpSingular("api.pocketcasts.com"),
-            urls: ["https://api.pocketcasts.com/health"]
-        ),
-        Service(
-            title: L10n.settingsStatusDiscover,
-            description: L10n.settingsStatusDiscoverDescription,
-            failureMessage: L10n.settingsStatusServiceAdBlockerHelpSingular("static.pocketcasts.com, cache.pocketcasts.com and podcasts.pocketcasts.com"),
-            urls: ["https://static.pocketcasts.com/discover/ios/content.json",
-                   "https://cache.pocketcasts.com/mobile/podcast/full/e7a6f7d0-02f2-0133-1c51-059c869cc4eb"]
-        ),
-        Service(
-            title: L10n.settingsStatusHost,
-            description: L10n.settingsStatusHostDescription,
-            failureMessage: L10n.settingsStatusHostFailureMessage,
-            urls: ["https://dts.podtrac.com/redirect.mp3/static.pocketcasts.com/assets/feeds/status/episode1.mp3"]
-        )
-    ]
+    /// Builds the service-check list from WhitelabelConfig. Internet and
+    /// ExpensiveNetwork are always included (local checks). The four
+    /// URL-backed services (refresh, account, discover, host) are omitted
+    /// when their WhitelabelConfig URL is empty — the white-label default
+    /// shows just the two local checks; branded forks see the full list
+    /// once they configure their server URLs.
+    lazy var checks: [Service] = {
+        var list: [Service] = [
+            Service(
+                title: L10n.settingsStatusInternet,
+                description: L10n.settingsStatusInternetDescription,
+                failureMessage: L10n.settingsStatusInternetFailureMessage
+            ),
+            Service(
+                title: L10n.settingsStatusExpensiveNetwork,
+                description: L10n.settingsStatusExpensiveNetworkDescription,
+                failureMessage: L10n.settingsStatusExpensiveNetworkFailureMessage,
+                customTest: {
+                    NetworkUtils.shared.isConnectedToUnexpensiveConnection()
+                }
+            ),
+        ]
+
+        if !WhitelabelConfig.refreshProductionURL.isEmpty,
+           let refreshHost = URL(string: WhitelabelConfig.refreshProductionURL)?.host {
+            let healthURL = WhitelabelConfig.refreshProductionURL.trimmingCharacters(in: CharacterSet(charactersIn: "/")) + "/health.html"
+            list.append(Service(
+                title: L10n.settingsStatusRefreshService,
+                description: L10n.settingsStatusRefreshServiceDescription,
+                failureMessage: L10n.settingsStatusServiceAdBlockerHelpSingular(refreshHost),
+                urls: [healthURL]
+            ))
+        }
+
+        if !WhitelabelConfig.apiProductionURL.isEmpty,
+           let apiHost = URL(string: WhitelabelConfig.apiProductionURL)?.host {
+            let healthURL = WhitelabelConfig.apiProductionURL.trimmingCharacters(in: CharacterSet(charactersIn: "/")) + "/health"
+            list.append(Service(
+                title: L10n.settingsStatusAccountService,
+                description: L10n.settingsStatusAccountServiceDescription,
+                failureMessage: L10n.settingsStatusServiceAdBlockerHelpSingular(apiHost),
+                urls: [healthURL]
+            ))
+        }
+
+        if !WhitelabelConfig.discoverProductionURL.isEmpty,
+           let discoverHost = URL(string: WhitelabelConfig.discoverProductionURL)?.host {
+            let discoverURL = WhitelabelConfig.discoverProductionURL.trimmingCharacters(in: CharacterSet(charactersIn: "/")) + "/ios/content.json"
+            list.append(Service(
+                title: L10n.settingsStatusDiscover,
+                description: L10n.settingsStatusDiscoverDescription,
+                failureMessage: L10n.settingsStatusServiceAdBlockerHelpSingular(discoverHost),
+                urls: [discoverURL]
+            ))
+        }
+
+        // The "host" check tests podtrac MP3 redirection against a known
+        // sample asset on the operator's CDN. Skip when the image/CDN URL
+        // isn't configured — a branded fork can supply its own status
+        // asset by setting imageProductionURL.
+        if !WhitelabelConfig.imageProductionURL.isEmpty {
+            let imageBase = WhitelabelConfig.imageProductionURL.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+            list.append(Service(
+                title: L10n.settingsStatusHost,
+                description: L10n.settingsStatusHostDescription,
+                failureMessage: L10n.settingsStatusHostFailureMessage,
+                urls: ["https://dts.podtrac.com/redirect.mp3/\(imageBase.replacingOccurrences(of: "https://", with: ""))/assets/feeds/status/episode1.mp3"]
+            ))
+        }
+
+        return list
+    }()
 
     private lazy var networkUtils = NetworkUtils.shared
 
