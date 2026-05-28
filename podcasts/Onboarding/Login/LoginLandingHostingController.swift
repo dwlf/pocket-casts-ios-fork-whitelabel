@@ -8,10 +8,22 @@ class LoginLandingHostingController<Content>: OnboardingHostingViewController<Co
         guard let viewModel = viewModel as? LoginCoordinator else { return }
 
         if !FeatureFlag.newOnboardingAccountCreation.enabled {
+            // Whitelabel: render configured brand name as UILabel;
+            // upstream renders the Pocket Casts SVG logo.
+            #if WHITELABEL
+            let titleLabel = UILabel()
+            titleLabel.text = WhitelabelConfig.brandName.isEmpty ? "Podcasts" : WhitelabelConfig.brandName
+            titleLabel.font = .systemFont(ofSize: 17, weight: .semibold)
+            titleLabel.textColor = ThemeColor.primaryText01()
+            titleLabel.accessibilityLabel = L10n.setupAccount
+            titleLabel.sizeToFit()
+            navigationItem.titleView = titleLabel
+            #else
             let imageView = ThemeableImageView(frame: .zero)
             imageView.imageNameFunc = AppTheme.pcLogoSmallHorizontalForBackgroundImageName
             imageView.accessibilityLabel = L10n.setupAccount
             navigationItem.titleView = imageView
+            #endif
         }
 
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)

@@ -84,10 +84,24 @@ fileprivate class InformationalModalHostingController<Content>: OnboardingHostin
 
         Settings.hasShownInformationalViewModal = true
 
+        // Brand title in the nav bar. Whitelabel builds render the
+        // configured brand name as a UILabel rather than the Pocket
+        // Casts SVG logo; see IntroCarouselView.swift for the matching
+        // SwiftUI variant of the same pattern.
+        #if WHITELABEL
+        let titleLabel = UILabel()
+        titleLabel.text = WhitelabelConfig.brandName.isEmpty ? "Podcasts" : WhitelabelConfig.brandName
+        titleLabel.font = .systemFont(ofSize: 17, weight: .semibold)
+        titleLabel.textColor = ThemeColor.primaryText01()
+        titleLabel.accessibilityLabel = L10n.setupAccount
+        titleLabel.sizeToFit()
+        navigationItem.titleView = titleLabel
+        #else
         let imageView = ThemeableImageView(frame: .zero)
         imageView.imageNameFunc = AppTheme.pcLogoSmallHorizontalForBackgroundImageName
         imageView.accessibilityLabel = L10n.setupAccount
         navigationItem.titleView = imageView
+        #endif
 
         let dismissItem: UIBarButtonItem
         dismissItem = UIBarButtonItem(image: UIImage(named: "close"), style: .plain, target: viewModel, action: #selector(viewModel.dismissTapped))

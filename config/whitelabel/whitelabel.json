@@ -1,7 +1,7 @@
 {
-    "_comment_brand": "Brand strings substituted into Swift constants and Localizable.strings at build time.",
-    "brand_name": "",
-    "brand_name_short": "",
+    "_comment_brand": "Brand strings substituted into Swift constants and Localizable.strings at build time. Default 'Whitelabel' / 'WL' match the MARKETING_NAME in Whitelabel.base.xcconfig so the placeholder brand is internally consistent across the splash, in-app strings, Info.plist display name, and nav-bar titles. Branded forks override via their own JSON.",
+    "brand_name": "Whitelabel",
+    "brand_name_short": "WL",
     "social_handle": "",
     "website_short": "",
     "support_email": "",
