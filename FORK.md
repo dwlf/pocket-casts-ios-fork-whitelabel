@@ -205,7 +205,11 @@ A pre-push git hook enforces.
   `EXCLUDED_SOURCE_FILE_NAMES`. (Stage 3 work; the configurations
   exist but the asset overlay isn't wired yet.)
 - `Localizable.strings` brand-stripped at build time (post-Copy
-  Bundle Resources phase, via `scripts/strip_brand_strings.sh`).
+  Bundle Resources phase, via `scripts/strip_brand_strings.py`).
+  Reads `MARKETING_NAME` and `WEBSITE_SHORT` from xcconfig and
+  rewrites the built `.lproj/Localizable.strings` binary plists in
+  place. No-ops when `MARKETING_NAME == "Pocket Casts"` so upstream
+  schemes pass through unmodified.
 - End-of-Year feature (`podcasts/End of Year/`) excluded from
   whitelabel builds.
 - Alternate app icons trimmed to default + dark; Pocket Casts
