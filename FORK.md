@@ -254,6 +254,12 @@ A pre-push git hook enforces.
   localized InfoPlist.strings translations are rewritten by the
   strip script above. The label users see on the first permission
   alert reads "Whitelabel needs to access your microphone…" etc.
+- File-type and CarPlay scene names in `podcasts/podcasts-Info.plist`
+  (`CFBundleTypeName`, `UTTypeDescription` for the podcast bundle UTI,
+  and `UISceneConfigurationName` for the CarPlay scene) use
+  `$(MARKETING_NAME)` substitution. Files.app, Share Sheet, and the
+  CarPlay scene config display "Whitelabel Bundle" / "Whitelabel Car"
+  in whitelabel builds.
 - End-of-Year feature (`podcasts/End of Year/`) excluded from
   whitelabel builds.
 - Alternate app icon picker hidden in whitelabel builds. The 19

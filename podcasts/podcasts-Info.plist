@@ -74,7 +74,7 @@
 		</dict>
 		<dict>
 			<key>CFBundleTypeName</key>
-			<string>Pocket Casts Bundle</string>
+			<string>$(MARKETING_NAME) Bundle</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>LSHandlerRank</key>
@@ -1059,7 +1059,7 @@
 					<key>UISceneClassName</key>
 					<string>CPTemplateApplicationScene</string>
 					<key>UISceneConfigurationName</key>
-					<string>Pocket Casts Car</string>
+					<string>$(MARKETING_NAME) Car</string>
 					<key>UISceneDelegateClassName</key>
 					<string>$(PRODUCT_MODULE_NAME).CarPlaySceneDelegate</string>
 				</dict>
@@ -1138,7 +1138,7 @@
 				<string>com.apple.package</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Pocket Casts Bundle</string>
+			<string>$(MARKETING_NAME) Bundle</string>
 			<key>UTTypeIconFiles</key>
 			<array/>
 			<key>UTTypeIdentifier</key>
