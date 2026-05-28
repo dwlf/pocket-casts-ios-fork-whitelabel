@@ -9,7 +9,8 @@ SIMULATOR_NAME = $(shell xcrun simctl list devices available \
 	| grep "iPhone" \
 	| tail -1 | sed 's/^[[:space:]]*//' | sed 's/ *(.*) *$$//')
 
-.PHONY: help build clean test lint lint_lenient format install_dependencies
+.PHONY: help build clean test lint lint_lenient format install_dependencies \
+        build_whitelabel verify-whitelabel sync-upstream
 
 define run_in_buildtools
 	@pushd BuildTools && \
@@ -67,6 +68,25 @@ build_staging: ## Builds using the StagingDebug configuration
        -destination 'generic/platform=iOS Simulator' \
        build
 
+build_whitelabel: ## Builds the Whitelabel Debug configuration using Xcode
+	xcodebuild -project podcasts.xcodeproj \
+       -scheme "Whitelabel Debug" \
+       -configuration WhitelabelDebug \
+       -destination 'generic/platform=iOS Simulator' \
+       build
+
+verify-whitelabel: ## Builds Whitelabel Debug end-to-end (pre-push gate)
+	xcodebuild -project podcasts.xcodeproj \
+       -scheme "Whitelabel Debug" \
+       -configuration WhitelabelDebug \
+       -destination 'generic/platform=iOS Simulator' \
+       build
+
+sync-upstream: ## Fetch upstream/trunk and merge into local trunk
+	git fetch upstream trunk
+	git merge --no-ff upstream/trunk -m "Merge upstream/trunk"
+	$(info Merge complete. Run 'make verify-whitelabel' before pushing.)
+
 test_staging: ## Build and run Unit Tests using the StagingDebug configuration
 	xcodebuild test -project podcasts.xcodeproj \
 	    -scheme "Pocket Casts Staging" \
@@ -85,7 +105,8 @@ install_dependencies: ## Install dependencies to run this project
 update_proto: ## Generates the protobuffer Swift files
 	./scripts/update_proto.sh $(API_PATH)
 
-external_contributor: ## Generates an empty ApiCredentials.swift so the app builds
+external_contributor: ## Generates empty ApiCredentials.swift + WhitelabelConfig.swift so the app builds
 	@cp podcasts/Credentials/ApiCredentials.tpl podcasts/Credentials/LocalApiCredentials.swift
 	@sed -i '' 's/%{.*}//' "podcasts/Credentials/LocalApiCredentials.swift"
+	@./scripts/generate_whitelabel_config.sh
 	$(info You're ready to build the app, go ahead! 🎙)
