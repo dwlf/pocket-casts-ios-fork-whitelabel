@@ -59,7 +59,14 @@ class LogsViewModel: NSObject, ObservableObject, MFMailComposeViewControllerDele
         let mailVC = MFMailComposeViewController()
         mailVC.mailComposeDelegate = self
         mailVC.setSubject("iOS Logs \(Settings.appVersion())")
-        mailVC.setToRecipients(["support@pocketcasts.com"])
+        // White-label default has no support email; leave the To field empty
+        // for the user to fill in. Branded forks set WhitelabelConfig.supportEmail.
+        // (The "pocketcasts-logs-X.txt" filename above is a local temp filename,
+        // not user-facing branding — left as-is.)
+        let toRecipients = WhitelabelConfig.supportEmail.isEmpty
+            ? []
+            : [WhitelabelConfig.supportEmail]
+        mailVC.setToRecipients(toRecipients)
         mailVC.setMessageBody("Please find attached my logs", isHTML: false)
         if let data = logs.data(using: .utf8) {
             mailVC.addAttachmentData(data, mimeType: UTType.plainText.preferredMIMEType ?? "plain/text", fileName: "logs.txt")
