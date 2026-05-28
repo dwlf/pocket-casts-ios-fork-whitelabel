@@ -6,11 +6,13 @@ Whitelabel xcconfig (MARKETING_NAME, WEBSITE_SHORT). Runs as a
 post-Copy-Bundle-Resources Xcode build phase on Whitelabel
 configurations only.
 
-Two file families are processed (both are binary property lists):
+Three file families are processed (all binary property lists):
 
     *.lproj/Localizable.strings   user-facing UI copy
     *.lproj/InfoPlist.strings     system permission prompts and
                                   bundle/scene names per locale
+    *.lproj/Intents.strings       Siri Shortcuts voice-command phrases
+                                  ("resume Pocket Casts", etc.)
 
 The English source Info.plist uses $(MARKETING_NAME) substitution
 directly (Xcode preprocesses Info.plist at build time), so the root
@@ -64,6 +66,7 @@ def main():
     lproj_strings = sorted(
         list(app_path.glob("*.lproj/Localizable.strings"))
         + list(app_path.glob("*.lproj/InfoPlist.strings"))
+        + list(app_path.glob("*.lproj/Intents.strings"))
     )
     print(f"strip_brand_strings: app={app_path} brand={brand!r} "
           f"website={website_short!r} files={len(lproj_strings)}")

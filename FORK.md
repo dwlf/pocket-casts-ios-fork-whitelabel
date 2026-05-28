@@ -238,12 +238,13 @@ A pre-push git hook enforces.
   chrome; neither is safe under an independent fork's brand. Slides
   still render brand header + quote + author attribution; the
   branded fork is expected to inject its own marketing imagery.
-- `Localizable.strings` and `InfoPlist.strings` brand-stripped at
-  build time (post-Copy Bundle Resources phase, via
-  `scripts/strip_brand_strings.py`). Reads `MARKETING_NAME` and
-  `WEBSITE_SHORT` from xcconfig and rewrites the built
-  `.lproj/Localizable.strings` and `.lproj/InfoPlist.strings`
-  binary plists in place. No-ops when
+- `Localizable.strings`, `InfoPlist.strings`, and `Intents.strings`
+  brand-stripped at build time (post-Copy Bundle Resources phase,
+  via `scripts/strip_brand_strings.py`). Reads `MARKETING_NAME` and
+  `WEBSITE_SHORT` from xcconfig and rewrites the three binary plist
+  families in every locale's `.lproj`. Intents.strings carries
+  Siri Shortcuts voice-command phrases ("resume Pocket Casts" etc.)
+  in all 15 shipped locales. No-ops when
   `MARKETING_NAME == "Pocket Casts"` so upstream schemes pass
   through unmodified.
 - System permission prompts (`NSBluetoothPeripheralUsageDescription`,
