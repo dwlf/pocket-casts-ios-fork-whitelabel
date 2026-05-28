@@ -162,6 +162,43 @@ git merge --abort  # if still mid-merge
 git reset --hard HEAD~1  # if merge committed but verify failed
 ```
 
+## Upstream pbxproj changes: avoid pbxproj libraries
+
+When `git merge upstream/trunk` brings in changes to
+`podcasts.xcodeproj/project.pbxproj` — especially changes to
+`XCConfigurationList` entries, `PBXNativeTarget.fileSystemSynchronizedGroups`,
+or any of the `PBXFileSystemSynchronized*` object types — **do not reach
+for a pbxproj library to "fix up" the merge**:
+
+- The Ruby `xcodeproj` gem (1.27.0, current as of this writing)
+  silently drops `PBXFileSystemSynchronizedBuildFileExceptionSet` entries
+  on round-trip — the project compiles in Xcode after re-save but loses
+  per-file build exceptions, breaking some targets.
+- The Python `pbxproj` package (4.3.3) drops both
+  `PBXFileSystemSynchronizedBuildFileExceptionSet` AND any PBX-File
+  reference with a non-hex UUID (the project uses some).
+
+Both libraries pre-date Xcode 16's `objectVersion = 74` and have not
+caught up. Watch the upstream
+[CocoaPods/Xcodeproj](https://github.com/CocoaPods/Xcodeproj) issue
+tracker for the fix.
+
+For now:
+
+- **Resolve textual merge conflicts** in `podcasts.xcodeproj/project.pbxproj`
+  by hand. Most are append-at-end-of-list conflicts (configurations,
+  buildConfigurations array entries, fileSystemSynchronizedGroups) and
+  resolve trivially "accept both".
+- **If you need to add a new configuration / target / sync group**
+  to mirror an upstream change, open `podcasts.xcodeproj` in Xcode and
+  use the UI. Xcode itself round-trips its own format faithfully; any
+  third-party tooling currently does not.
+- **For one-line attribute changes** (e.g. swapping
+  `baseConfigurationReferenceRelativePath = X` to
+  `Y` on an existing block), a focused text-edit script is safe —
+  the failure mode is library-driven block-cloning, not single-line
+  attribute swaps.
+
 ## When the playbook breaks
 
 If a file outside the predictable set shows a real conflict —
