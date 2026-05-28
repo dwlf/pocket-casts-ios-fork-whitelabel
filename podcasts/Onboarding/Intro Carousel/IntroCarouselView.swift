@@ -1,3 +1,4 @@
+import PocketCastsUtils
 import SwiftUI
 import EndOfYear
 
@@ -61,10 +62,20 @@ struct IntroCarouselView: View {
         CarouselItem(
             contentView: {
                 VStack(spacing: 100) {
+                    // Brand header at the top of the splash carousel.
+                    // Whitelabel builds render the configured brand name
+                    // as plain Text rather than the upstream Pocket Casts
+                    // SVG logo — avoids per-fork SVG asset maintenance.
+                    #if WHITELABEL
+                    Text(WhitelabelConfig.brandName.isEmpty ? "Podcasts" : WhitelabelConfig.brandName)
+                        .font(.system(size: 22, weight: .bold))
+                        .frame(height: 40)
+                    #else
                     Image(AppTheme.pcLogoSmallHorizontalForBackgroundImageName())
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 40)
+                    #endif
 
                     Image("intro-carousel-podcasts")
                         .resizable()
