@@ -176,6 +176,15 @@ public class ServerPodcastManager: NSObject {
         DataManager.sharedManager.save(episode: episode)
     }
 
+    /// Adds a podcast assembled from a locally-parsed RSS feed (rather than the
+    /// cache host). `podcastInfo` must match the shape `addPodcast` consumes:
+    /// `["podcast": ["uuid": ..., "episodes": [...]]]`. Reuses the standard
+    /// save pipeline so episodes, sort order, and latest-episode info are set.
+    @discardableResult
+    public func addPodcastFromFeed(podcastInfo: [String: Any], subscribe: Bool) -> Bool {
+        addPodcast(podcastInfo: podcastInfo, subscribe: subscribe, autoDownloads: 0, lastModified: nil)
+    }
+
     private func addPodcast(podcastInfo: [String: Any], subscribe: Bool, autoDownloads: Int = 0, lastModified: String?) -> Bool {
         guard let podcastJson = podcastInfo["podcast"] as? [String: Any], let podcastUuid = podcastJson["uuid"] as? String else { return false }
 

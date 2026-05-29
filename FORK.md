@@ -340,9 +340,25 @@ A pre-push git hook enforces.
     banner are hidden.
   - Podcast search (`PodcastSearchTask`, `CombinedSearchTask`,
     `PredictiveSearchTask`) returns empty instead of hitting an empty
-    host; adding a podcast by RSS URL still works.
+    host. Adding a podcast by RSS feed URL or Apple Podcasts link works
+    via on-device ingestion (below).
   - The About screen shows the brand name instead of the Pocket Casts
     logo.
+- Backend-free podcast ingestion (`FeedIngestion`, in
+  `podcasts/New Search/`). Pasting an RSS feed URL or an Apple Podcasts
+  link (`podcasts.apple.com/.../id<digits>`) into the search bar adds
+  the podcast without the Pocket Casts cache host: an Apple link is
+  resolved to its RSS feed via the public iTunes Lookup API, the feed is
+  fetched and parsed on-device (AEXML), and the channel/items are mapped
+  into the shape `Podcast.from` / `Episode.from` consume, then saved via
+  the new `ServerPodcastManager.addPodcastFromFeed`. Podcast and episode
+  UUIDs are derived deterministically (SHA-256 of the feed URL / episode
+  GUID) so re-adds and refreshes are idempotent. `SearchResultsModel`
+  routes any URL through ingestion, and `SearchResultsViewController`
+  ingests on the as-you-type timer so a pasted link adds without a
+  separate submit. Feed refresh and showing the feed's own cover art
+  (rather than the neutral placeholder) are not yet wired — see
+  `docs/known-issues.md`.
 - `.buildkite/` is present but inert. Automattic CI infrastructure
   is not available here.
 - `.configure-files/` ships empty. The inherited `pocketcasts`

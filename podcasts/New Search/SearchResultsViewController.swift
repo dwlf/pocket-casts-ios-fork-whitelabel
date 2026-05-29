@@ -62,7 +62,13 @@ extension SearchResultsViewController: SearchResultsDelegate {
             completion()
         }
 
-        if FeatureFlag.searchPredictive.enabled, triggeredByTimer {
+        // A pasted/typed feed or Apple Podcasts URL is ingested locally; route
+        // it straight to search() (which ingests) even on the as-you-type timer
+        // so it adds without a separate submit and without flashing "No Results".
+        let trimmed = searchTerm.trim().lowercased()
+        let isURL = trimmed.startsWith(string: "http://") || trimmed.startsWith(string: "https://")
+
+        if FeatureFlag.searchPredictive.enabled, triggeredByTimer, !isURL {
             searchResults.predictiveSearch(term: searchTerm)
         } else {
             searchResults.search(term: searchTerm)

@@ -96,7 +96,12 @@ class SearchResultsModel: ObservableObject {
 
     @MainActor
     func search(term: String) {
-        if FeatureFlag.searchImprovements.enabled, !isTermAnURL(term) {
+        if isTermAnURL(term) {
+            ingestFeed(term: term)
+            return
+        }
+
+        if FeatureFlag.searchImprovements.enabled {
             combinedSearch(term: term)
             return
         }
@@ -138,6 +143,37 @@ class SearchResultsModel: ObservableObject {
             }
         } else {
             hideEpisodes = true
+        }
+
+        analyticsHelper.trackSearchPerformed()
+    }
+
+    /// Adds a podcast from a pasted RSS feed URL or Apple Podcasts link by
+    /// parsing the feed on-device (no backend), then shows it as the result.
+    @MainActor
+    private func ingestFeed(term: String) {
+        currentSearchTerm = term
+        clearErrors()
+        if !isShowingLocalResultsOnly {
+            clearSearch()
+        }
+        hideEpisodes = true
+
+        Task {
+            isSearchingForPodcasts = true
+            do {
+                let uuid = try await FeedIngestion.ingest(from: term, subscribe: true)
+                if let podcast = DataManager.sharedManager.findPodcast(uuid: uuid, includeUnsubscribed: true),
+                   let result = PodcastFolderSearchResult(from: podcast) {
+                    show(podcastResults: [result])
+                } else {
+                    show(podcastResults: [])
+                }
+            } catch {
+                podcastSearchError = error
+                analyticsHelper.trackFailed(error)
+            }
+            isSearchingForPodcasts = false
         }
 
         analyticsHelper.trackSearchPerformed()
