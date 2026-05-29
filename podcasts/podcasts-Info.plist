@@ -1089,7 +1089,7 @@
 	<key>UIBrowsableContentSupportsSectionedBrowsing</key>
 	<false/>
 	<key>UILaunchStoryboardName</key>
-	<string>Launch Screen</string>
+	<string>$(LAUNCH_STORYBOARD_NAME)</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>

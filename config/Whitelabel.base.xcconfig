@@ -28,6 +28,12 @@ MARKETING_NAME = Whitelabel
 // at build time (Stage 3). Empty default leaves a generic noun in copy.
 WEBSITE_SHORT =
 
+// Logo-free launch screen nib. Selected via Info.plist
+// UILaunchStoryboardName = $(LAUNCH_STORYBOARD_NAME). The default
+// "Launch Screen" nib renders the Pocket Casts splash logo as a
+// watermark; this variant is a plain dark background only.
+LAUNCH_STORYBOARD_NAME = Launch Screen-Whitelabel
+
 // Source-of-truth JSON for WhitelabelConfig.swift generation. The branded
 // fork overrides this to point at config/brand/<brand>.json.
 WHITELABEL_CONFIG_JSON = $(SRCROOT)/config/whitelabel/whitelabel.json

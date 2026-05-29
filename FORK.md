@@ -268,6 +268,18 @@ A pre-push git hook enforces.
   Source PNG is reproducible via
   `python3 scripts/generate_whitelabel_appicon.py`. The watch app,
   App Clip, and TV app icons are untouched (out of Stage 3 scope).
+- Launch screen: `podcasts/podcasts-Info.plist` selects the nib via
+  `UILaunchStoryboardName = $(LAUNCH_STORYBOARD_NAME)`.
+  `LAUNCH_STORYBOARD_NAME` is `Launch Screen` in
+  `PocketCasts.base.xcconfig` and `Launch Screen-Whitelabel` in
+  `Whitelabel.base.xcconfig`. The Whitelabel nib is a plain dark-slate
+  background. Both nibs ship in the bundle.
+- Pull-to-refresh spinner: under `#if WHITELABEL`,
+  `CustomRefreshControl` loads `refresh_inner_whitelabel` /
+  `refresh_outer_whitelabel` — neutral concentric ring-arcs that keep
+  the two-ring rotation animation. The PNGs (46@2x / 69@3x) are
+  reproducible via `python3 scripts/generate_whitelabel_refresh.py`
+  and sit inline in `podcasts/CommonImages.xcassets/`.
 - Other asset catalogs (`Onboarding`, `Subscription`, etc.) remain
   on the plan to be overlaid by neutral variants under a
   `Whitelabel.*.xcassets` parallel set with
@@ -383,6 +395,20 @@ Non-obvious facts worth knowing before working on the decoupling layer.
   URLs there are by design, not a regression.
 - **`#if` is invalid inside a Swift array/collection literal.** Build the
   array in a closure-initialized `let` and append conditionally instead.
+- **The native launch screen renders before app code, so in-app swaps
+  can't reach it.** The `splashlogo` watermark in the launch nib is
+  invisible to any `#if WHITELABEL` Swift branch or runtime Text-swap.
+  Select a logo-free nib per configuration instead:
+  `UILaunchStoryboardName = $(LAUNCH_STORYBOARD_NAME)` in the shared
+  Info.plist, with the value defined in each base xcconfig. The same
+  `$(VAR)`-in-Info.plist substitution pattern works for any launch-time
+  plist key that needs to differ by brand without forking the plist.
+- **Template-rendered assets only carry shape in their alpha channel.**
+  The refresh spinner arcs are loaded `.withRenderingMode(.alwaysTemplate)`,
+  so a neutral replacement just needs opaque-on-transparent geometry —
+  the runtime tint (`CustomRefreshControl.updateTintColor`) supplies the
+  colour. Generate as white-on-transparent and verify by compositing on
+  a dark background, not by eyeballing the raw PNG (invisible on white).
 
 ### Verification
 
@@ -406,8 +432,6 @@ Non-obvious facts worth knowing before working on the decoupling layer.
   multi-remote repo. Always pass `--repo dwlf/pocket-casts-ios-fork-whitelabel`
   for issues, or work lands on the wrong tracker. The configured PAT can
   create issues but not comment on them.
-- **`docs/decisions/` is gitignored** — decision records placed there are
-  not committed. Durable notes go in this file.
 
 ## Known issues
 

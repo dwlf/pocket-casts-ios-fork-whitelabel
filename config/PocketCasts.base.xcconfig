@@ -21,4 +21,10 @@ APP_GROUP_ID = group.au.com.shiftyjelly.pocketcasts
 // Whitelabel xcconfig can override without forking podcasts-Info.plist.
 MARKETING_NAME = Pocket Casts
 
+// Launch screen nib selected via Info.plist UILaunchStoryboardName =
+// $(LAUNCH_STORYBOARD_NAME). The Whitelabel xcconfig points this at a
+// logo-free nib so the native startup background carries no Pocket Casts
+// mark (the in-app splash Text-swap cannot reach the native launch screen).
+LAUNCH_STORYBOARD_NAME = Launch Screen
+
 DEVELOPMENT_TEAM = PZYM8XX95Q // Automattic, Inc. (Company)
