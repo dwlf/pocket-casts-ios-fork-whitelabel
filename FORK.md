@@ -364,9 +364,10 @@ A pre-push git hook enforces.
   GUID) so re-adds and refreshes are idempotent. `SearchResultsModel`
   routes any URL through ingestion, and `SearchResultsViewController`
   ingests on the as-you-type timer so a pasted link adds without a
-  separate submit. Feed refresh and showing the feed's own cover art
-  (rather than the neutral placeholder) are not yet wired — see
-  `docs/known-issues.md`.
+  separate submit. The feed's `<itunes:image>` is shown as the cover
+  art — `ImageManager.podcastUrl` prefers `Podcast.imageURL` over the
+  cache-host CDN URL when set (`#if WHITELABEL`). Feed refresh is not
+  yet wired — see `docs/known-issues.md`.
 - `.buildkite/` is present but inert. Automattic CI infrastructure
   is not available here.
 - `.configure-files/` ships empty. The inherited `pocketcasts`

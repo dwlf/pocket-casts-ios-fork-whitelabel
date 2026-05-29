@@ -481,6 +481,9 @@ class ImageManager {
 
     @objc private func podcastAddedNotification(notification: Notification) {
         if let podcastUuid = notification.object as? String {
+            #if WHITELABEL
+            feedArtworkURLCache[podcastUuid] = nil
+            #endif
             cacheImages(podcastUuid: podcastUuid)
         }
     }
@@ -549,11 +552,42 @@ class ImageManager {
     #endif
 
     func podcastUrl(imageSize: PodcastThumbnailSize, uuid: String) -> URL {
+        #if WHITELABEL
+        // Podcasts added by FeedIngestion carry the feed's own artwork in
+        // `imageURL`; the cache-host CDN (below) has no record of them, so
+        // prefer imageURL to show the real cover instead of the placeholder.
+        if let feedArtwork = feedArtworkURL(podcastUuid: uuid) {
+            return feedArtwork
+        }
+        #endif
+
         let sizeRequired = ImageManager.sizeFor(imageSize: imageSize)
         let closestSize = closestImageSize(sizeRequired: sizeRequired)
 
         return ServerHelper.imageUrl(podcastUuid: uuid, size: closestSize)
     }
+
+    #if WHITELABEL
+    // `podcastUrl` is called per cell in lists and `findPodcast` is a DB
+    // query, so resolved feed-artwork URLs are cached. Only positive results
+    // are cached: a podcast's `imageURL` is set just after it is added (by
+    // FeedIngestion), and the podcastAdded → cacheImages prefetch can ask for
+    // the URL before then. Caching that transient "no artwork" miss would
+    // pin the placeholder permanently, so misses are re-resolved each call.
+    private var feedArtworkURLCache: [String: URL] = [:]
+
+    private func feedArtworkURL(podcastUuid: String) -> URL? {
+        if let cached = feedArtworkURLCache[podcastUuid] {
+            return cached
+        }
+        guard let imageURL = DataManager.sharedManager.findPodcast(uuid: podcastUuid, includeUnsubscribed: true)?.imageURL,
+              !imageURL.isEmpty, let url = URL(string: imageURL) else {
+            return nil
+        }
+        feedArtworkURLCache[podcastUuid] = url
+        return url
+    }
+    #endif
 
     private func closestImageSize(sizeRequired: Int) -> Int {
         var closeness = 999

@@ -155,7 +155,7 @@ When adding a backend-bearing branded fork, none of these need action.
 If a future build makes any of them reachable without a backend, gate
 them on `WhitelabelConfig.hasBackend` the same way `fork#3` did.
 
-## Locally-ingested feeds: no refresh, no cover art
+## Locally-ingested feeds: no refresh
 
 Podcasts added via `FeedIngestion` (RSS URL or Apple Podcasts link)
 capture their episodes at add time only:
@@ -165,9 +165,7 @@ capture their episodes at add time only:
   episodes won't appear until a refresh path re-parses the feed. The
   deterministic UUIDs make a future re-parse idempotent (it will upsert
   rather than duplicate).
-- **Neutral cover art.** The podcast's `imageURL` is set from the feed's
-  `<itunes:image>`, but the artwork loader builds its URL from the cache
-  host by UUID (`ImageManager.podcastUrl(imageSize:uuid:)`) and does not
-  consult `imageURL`, so feed-ingested podcasts fall back to the neutral
-  placeholder. Wiring the loader to prefer `podcast.imageURL` when set
-  would show the real cover.
+
+Cover art *is* shown: `ImageManager.podcastUrl` prefers the podcast's
+`imageURL` (set from the feed's `<itunes:image>`) over the cache-host
+CDN URL under `#if WHITELABEL`.
