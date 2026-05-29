@@ -19,7 +19,7 @@ By adopting this Code of Conduct, project maintainers commit themselves to fairl
 
 This Code of Conduct applies both within project spaces and in public spaces when an individual is representing the project or its community.
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported by emailing a project maintainer via [support@pocketcasts.com](mailto:support@pocketcasts.com), with a subject that includes `Code of Conduct`. All complaints will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances. Maintainers are obligated to maintain confidentiality with regard to the reporter of an incident.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported privately to the maintainers of this fork by opening a [GitHub Security Advisory](https://github.com/dwlf/pocket-casts-ios-fork-whitelabel/security/advisories/new) (the private channel doubles for conduct reports) or by contacting a maintainer directly via their GitHub profile. All complaints will be reviewed and investigated and will result in a response that is deemed necessary and appropriate to the circumstances. Maintainers are obligated to maintain confidentiality with regard to the reporter of an incident.
 
 
 This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.3.0, available at [http://contributor-covenant.org/version/1/3/0/][version]
