@@ -158,20 +158,47 @@ them on `WhitelabelConfig.hasBackend` the same way `fork#3` did.
 ## Locally-ingested feeds: backend-build re-parse not wired
 
 Refresh for locally-ingested feeds is wired for no-backend builds
-(`fork#11`): when `WhitelabelConfig.hasBackend == false`, `RefreshManager`
-routes every refresh trigger (pull-to-refresh, background, foreground) to
-an on-device re-parse via the `ServerSyncDelegate.refreshLocalFeeds` seam
-instead of the cache host. The deterministic episode UUIDs make the
-re-parse idempotent — existing episodes are matched and skipped, only new
-ones are inserted.
+(`fork#11`): when `WhitelabelConfig.hasBackend == false`, both refresh
+entry points re-parse feeds on-device via the
+`ServerSyncDelegate.refreshLocalFeeds` seam instead of the cache host —
+`RefreshManager` for library-wide triggers (grid pull-to-refresh,
+background, foreground) and `PodcastFeedViewModel.reloadFeed` for the
+per-podcast detail-screen pull-to-refresh. The deterministic episode UUIDs
+make the re-parse idempotent — existing episodes are matched and skipped,
+only new ones are inserted.
 
 The remaining gap is **backend builds with manually-pasted RSS feeds**.
-`FeedIngestion` runs in any build when a URL is pasted into search, so a
-backend-bearing fork can hold a locally-ingested podcast the cache host
-doesn't know about. Those podcasts are not re-parsed (the `hasBackend`
-gate keeps backend builds on the cache-host path). To cover that case,
-detect locally-ingested podcasts per-podcast (by stored `podcastUrl`) and
-re-parse them alongside the cache-host refresh.
+`SearchResultsModel.search(term:)` routes any pasted URL to
+`FeedIngestion.ingest` with no `hasBackend` gate, so a backend-bearing fork
+can hold a locally-ingested podcast the cache host doesn't know about.
+Those podcasts are not re-parsed (the `hasBackend` gate keeps backend
+builds on the cache-host path), so they never gain new episodes.
+
+To cover that case (recipe, not yet implemented — inert in this no-backend
+build, so deferred under YAGNI):
+
+1. **Detect** locally-ingested podcasts. There is no `isLocal` column;
+   recompute the deterministic UUID from `podcastUrl` and compare to the
+   stored `uuid`:
+   `FeedIngestion.deterministicUUID(from: podcast.podcastUrl) == podcast.uuid`.
+   Locally-ingested podcasts match (their UUID *is* `SHA-256(feedURL)`);
+   cache-host podcasts have server-random UUIDs that don't.
+2. **Filter** inside `ServerSyncManager.refreshLocalFeeds` to only the
+   podcasts that pass the detector (no-backend: all pass, harmless;
+   backend: just the local subset). Detection must live here, not in
+   `RefreshManager`, because `deterministicUUID` is in the app target and
+   the Server module can't reach it.
+3. **Wire** `RefreshManager`'s backend path to call
+   `syncDelegate.refreshLocalFeeds(podcasts:)` alongside
+   `MainServerHandler.shared.refresh`, and post `manyEpisodesChanged` after
+   inserts so the open UI reloads (as `fork#11` did with `podcastUpdated`),
+   without double-firing the cache-host refresh notifications.
+
+The detector is a **correctness gate, not an optimization**: running
+`FeedIngestion.refresh` on a cache-host podcast would mint deterministic
+episode UUIDs that differ from the server-assigned ones, duplicating every
+episode. Only podcasts whose episodes already use the deterministic scheme
+may be re-parsed.
 
 Cover art *is* shown: `ImageManager.podcastUrl` prefers the podcast's
 `imageURL` (set from the feed's `<itunes:image>`) over the cache-host
