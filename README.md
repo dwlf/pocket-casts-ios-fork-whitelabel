@@ -28,6 +28,12 @@ Swift sources are unchanged from upstream wherever possible — brand
 and server values are read through a generated `WhitelabelConfig`
 struct, not hard-coded.
 
+Batteries included — but just the one. The empty-config build runs out
+of the box: install it, add podcasts by RSS or Apple Podcasts link, and
+play. The server-backed half of the app (sync, Discover, search,
+accounts, IAP) stays dark until you supply a backend — see *What this is
+not* below.
+
 ## What this is not
 
 - **A working podcast cloud service.** The app launches and plays
