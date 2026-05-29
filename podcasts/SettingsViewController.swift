@@ -21,7 +21,7 @@ class SettingsViewController: PCViewController, UITableViewDataSource, UITableVi
                 return WCSession.isSupported()
 
             case .pocketCastsPlus:
-                return !SubscriptionHelper.hasActiveSubscription()
+                return WhitelabelConfig.hasBackend && !SubscriptionHelper.hasActiveSubscription()
 
             default:
                 return true

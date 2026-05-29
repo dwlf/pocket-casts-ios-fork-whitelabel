@@ -326,6 +326,23 @@ A pre-push git hook enforces.
   catalog itself is still bundled (bundle-size trim is plan items
   28-30 territory); the threat surface is closed because no UI
   reaches the alternates.
+- No-backend graceful degradation, gated on the runtime flag
+  `WhitelabelConfig.hasBackend` (`!apiProductionURL.isEmpty`; false in
+  the public empty-config build, true for branded forks and upstream):
+  - Initial onboarding is skipped
+    (`MainTabBarController.showInitialOnboardingIfNeeded`); the app opens
+    on the Podcasts tab, which is also the default launch tab.
+  - Subscription upsells are suppressed: `PaidFeature.isUnlocked`
+    returns `true` (premium features work and their locked-state prompts
+    never render), `PaidFeature.presentUpgradeController` and
+    `NavigationManager.showUpsellView` no-op, and the Profile, Settings,
+    Appearance, Files, Watch upgrade banners and the encourage-account
+    banner are hidden.
+  - Podcast search (`PodcastSearchTask`, `CombinedSearchTask`,
+    `PredictiveSearchTask`) returns empty instead of hitting an empty
+    host; adding a podcast by RSS URL still works.
+  - The About screen shows the brand name instead of the Pocket Casts
+    logo.
 - `.buildkite/` is present but inert. Automattic CI infrastructure
   is not available here.
 - `.configure-files/` ships empty. The inherited `pocketcasts`
@@ -395,6 +412,15 @@ Non-obvious facts worth knowing before working on the decoupling layer.
   URLs there are by design, not a regression.
 - **`#if` is invalid inside a Swift array/collection literal.** Build the
   array in a closure-initialized `let` and append conditionally instead.
+- **Gate server-dependent behaviour on `WhitelabelConfig.hasBackend`
+  (runtime), not `#if WHITELABEL` (compile-time).** The branded fork
+  compiles with `-D WHITELABEL` but ships real server URLs, so it must
+  run the full onboarding / upsell / search flows; only the public
+  empty-config build (`hasBackend == false`) skips them. Reserve
+  `#if WHITELABEL` for pure brand-art swaps (logos, names) that every
+  white-label build wants regardless of backend. `hasBackend` is a
+  value check in PocketCastsUtils, so it works inside the SwiftPM
+  modules where `#if WHITELABEL` does not reach.
 - **The native launch screen renders before app code, so in-app swaps
   can't reach it.** The `splashlogo` watermark in the launch nib is
   invisible to any `#if WHITELABEL` Swift branch or runtime Text-swap.

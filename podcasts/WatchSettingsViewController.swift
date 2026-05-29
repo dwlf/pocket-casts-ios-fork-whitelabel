@@ -1,4 +1,5 @@
 import PocketCastsServer
+import PocketCastsUtils
 import UIKit
 
 class WatchSettingsViewController: PCViewController, UITableViewDelegate, UITableViewDataSource {
@@ -46,7 +47,7 @@ class WatchSettingsViewController: PCViewController, UITableViewDelegate, UITabl
 
     private func tableSections() -> [TableSections] {
         var sections: [TableSections] = [.upNext]
-        if !SubscriptionHelper.hasActiveSubscription(), !Settings.plusInfoDismissedOnWatch() {
+        if WhitelabelConfig.hasBackend, !SubscriptionHelper.hasActiveSubscription(), !Settings.plusInfoDismissedOnWatch() {
             sections.append(.lockedInfo)
         }
 

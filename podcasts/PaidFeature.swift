@@ -25,7 +25,15 @@ extension PaidFeature {
 class PaidFeature: ObservableObject {
     /// Whether the feature is unlocked for the active subscription tier
     var isUnlocked: Bool {
-        subscriptionHelper.activeTier >= tier
+        // Without a configured backend there is no store to subscribe through,
+        // so every paid feature is treated as unlocked: the app stays fully
+        // usable and the locked-state prompts (which gate on isUnlocked, and
+        // carry Pocket Casts brand art) never appear. Branded forks and the
+        // upstream build report hasBackend == true and use the tier check.
+        if !WhitelabelConfig.hasBackend {
+            return true
+        }
+        return subscriptionHelper.activeTier >= tier
     }
 
     /// The minimum subscription level required to unlock this feature
@@ -88,6 +96,12 @@ extension PaidFeature {
 
     /// Presents the `upgradeController` from the given view controller
     func presentUpgradeController(from controller: UIViewController, source: PlusUpgradeViewSource, customTitle: String? = nil) {
+        // No backend → no purchasing; suppress the upsell rather than present a
+        // dead-end flow. Reactive callers are already gated by isUnlocked; this
+        // is a backstop for any direct caller.
+        guard WhitelabelConfig.hasBackend else {
+            return
+        }
         controller.presentFromRootController(upgradeController(source: source, customTitle: customTitle))
     }
 

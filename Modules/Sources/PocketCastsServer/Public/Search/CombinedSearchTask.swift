@@ -1,4 +1,5 @@
 import Foundation
+import PocketCastsUtils
 
 struct CombinedSearchEnvelope: Decodable {
     public let results: [CombinedSearchResult]
@@ -43,6 +44,11 @@ public class CombinedSearchTask {
     }
 
     public func search(term: String) async throws -> [CombinedSearchResultType] {
+        // No backend → no search host; return empty rather than hitting an
+        // empty URL and hanging.
+        guard WhitelabelConfig.hasBackend else {
+            return []
+        }
         let components = URLComponents(string: ServerConstants.Urls.cache() + "search/combined")
         guard let searchURL = components?.url,
               let request = ServerHelper.createJsonRequest(url: searchURL, params: ["term": term], timeout: 10, cachePolicy: .reloadIgnoringCacheData)

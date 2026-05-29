@@ -1,4 +1,5 @@
 import PocketCastsServer
+import PocketCastsUtils
 import UIKit
 
 class AppearanceViewController: PCViewController, UITableViewDataSource, UITableViewDelegate, IconSelectorCellDelegate {
@@ -270,7 +271,7 @@ class AppearanceViewController: PCViewController, UITableViewDataSource, UITable
         newTableData.removeAll { $0 == [.appIcon] }
         #endif
 
-        if !SubscriptionHelper.hasActiveSubscription(), !Settings.plusInfoDismissedOnAppearance() {
+        if WhitelabelConfig.hasBackend, !SubscriptionHelper.hasActiveSubscription(), !Settings.plusInfoDismissedOnAppearance() {
             newTableData.append([.plusCallout])
         }
 

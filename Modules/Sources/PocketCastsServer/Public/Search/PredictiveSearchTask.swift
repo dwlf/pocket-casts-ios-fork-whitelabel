@@ -1,4 +1,5 @@
 import Foundation
+import PocketCastsUtils
 
 struct PredictiveSearchEnvelope: Decodable {
     public let results: [PredictiveSearchResult]
@@ -49,6 +50,11 @@ public class PredictiveSearchTask {
     }
 
     public func search(term: String) async throws -> [PredictiveSearchResult] {
+        // No backend → no search host; return empty rather than hitting an
+        // empty URL and hanging.
+        guard WhitelabelConfig.hasBackend else {
+            return []
+        }
         var components = URLComponents(string: ServerConstants.Urls.search + "autocomplete/search")
         components?.queryItems = [URLQueryItem(name: "q", value: term)]
         guard let searchURL = components?.url else {

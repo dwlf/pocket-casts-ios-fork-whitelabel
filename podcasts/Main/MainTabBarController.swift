@@ -174,9 +174,11 @@ class MainTabBarController: UITabBarController, NavigationProtocol {
             viewDidAppearBefore = true
         }
 
-        // if this key was never set lets default to Discovery or Podcast depending of podcasts followed
+        // if this key was never set lets default to Discovery or Podcast depending of podcasts followed.
+        // Without a backend, Discover can never load, so always default to Podcasts.
         if UserDefaults.standard.object(forKey: Constants.UserDefaults.lastTabOpened) == nil {
-            selectedIndex = DataManager.sharedManager.podcastCount() > 0 ? Tab.podcasts.rawValue: Tab.discover.rawValue
+            let preferPodcasts = DataManager.sharedManager.podcastCount() > 0 || !WhitelabelConfig.hasBackend
+            selectedIndex = preferPodcasts ? Tab.podcasts.rawValue : Tab.discover.rawValue
         }
 
         showInitialOnboardingIfNeeded()
@@ -229,6 +231,16 @@ class MainTabBarController: UITabBarController, NavigationProtocol {
     }
 
     private func showInitialOnboardingIfNeeded() {
+        // Without a configured backend the onboarding funnel (Discover
+        // recommendations + account creation) hits an empty host and hangs on
+        // a spinner with no way forward. Skip it and land in the app; podcasts
+        // can still be added by RSS URL. Branded forks with real URLs and the
+        // upstream Pocket Casts build both report hasBackend == true and run
+        // the normal flow.
+        guard WhitelabelConfig.hasBackend else {
+            return
+        }
+
         // Show if the user is not logged in and has never seen the prompt before
         if SyncManager.isUserLoggedIn() || (Settings.shouldShowInitialOnboardingFlow == false && Settings.hasSeenInitialOnboardingBefore == true) {
             return

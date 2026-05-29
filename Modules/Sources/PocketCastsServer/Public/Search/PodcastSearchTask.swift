@@ -1,5 +1,6 @@
 import Foundation
 import PocketCastsDataModel
+import PocketCastsUtils
 
 struct PodcastsSearchEnvelope: Decodable {
     let status: String
@@ -97,6 +98,14 @@ public class PodcastSearchTask {
     }
 
     public func search(term: String) async throws -> [PodcastFolderSearchResult] {
+        // Without a configured backend there is no search host; the request URL
+        // would be hostless and the poll loop would hang. Return no results so
+        // the search UI shows its empty state. Adding a podcast by RSS URL is a
+        // separate path and still works.
+        guard WhitelabelConfig.hasBackend else {
+            return []
+        }
+
         var envelope: PodcastsSearchEnvelope?
         var retry = true
         var pollCount = 0

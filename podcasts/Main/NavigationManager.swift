@@ -308,6 +308,12 @@ class NavigationManager {
 
 extension NavigationManager {
     func showUpsellView(from controller: UIViewController, source: PlusUpgradeViewSource, context: OnboardingFlow.Context? = nil, flow: OnboardingFlow.Flow = .plusUpsell) {
+        // Without a configured backend there is no store; suppress every
+        // subscription upsell instead of presenting a dead-end flow that also
+        // leaks Pocket Casts brand art.
+        guard WhitelabelConfig.hasBackend else {
+            return
+        }
         navigateTo(Self.subscriptionRequiredPageKey, data: [Self.subscriptionUpgradeVCKey: controller, "source": source, "flow": flow, "context": context ?? [:]])
     }
 }

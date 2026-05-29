@@ -1,4 +1,5 @@
 import PocketCastsServer
+import PocketCastsUtils
 import UIKit
 
 class UploadedSettingsViewController: PCViewController, UITableViewDelegate, UITableViewDataSource {
@@ -42,7 +43,7 @@ class UploadedSettingsViewController: PCViewController, UITableViewDelegate, UIT
 
     private func tableSections() -> [TableSections] {
         var sections: [TableSections] = [.autoAddToUpNext, .afterPlaying, .autoSync, .onlyOnWifi]
-        if !SubscriptionHelper.hasActiveSubscription(), !Settings.plusInfoDismissedOnFilesSettings() {
+        if WhitelabelConfig.hasBackend, !SubscriptionHelper.hasActiveSubscription(), !Settings.plusInfoDismissedOnFilesSettings() {
             sections.append(.lockedInfo)
         }
 

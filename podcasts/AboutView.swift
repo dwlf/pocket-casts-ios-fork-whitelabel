@@ -28,8 +28,15 @@ struct AboutView: View {
                 VStack {
                     VStack {
                         ModalCloseButton(action: dismissAction)
+                        #if WHITELABEL
+                        Text(WhitelabelConfig.brandName)
+                            .font(.largeTitle.weight(.bold))
+                            .foregroundColor(ThemeColor.primaryText01(for: theme.activeTheme).color)
+                            .accessibilityHidden(true)
+                        #else
                         Image(AppTheme.pcLogoVerticalImageName())
                             .accessibilityHidden(true)
+                        #endif
                         Text(Settings.displayableVersion())
                             .font(.subheadline)
                             .textStyle(SecondaryText())
