@@ -499,6 +499,14 @@ class ImageManager {
         if let cached = placeholderImageCache[key] {
             return cached
         }
+
+        #if WHITELABEL
+        // The upstream noartwork-* assets are the Pocket Casts logo, which
+        // would leak as the cover placeholder on the grid, podcast page, and
+        // player. Render a neutral placeholder instead (plain panel + generic
+        // waveform glyph). Branded forks may replace this with their own art.
+        let image = Self.whitelabelPlaceholder(size: size, isDark: key.isDark)
+        #else
         let name: String
         switch size {
         case .grid:
@@ -508,10 +516,37 @@ class ImageManager {
         case .page, .detail:
             name = key.isDark ? "noartwork-page-dark" : "noartwork-page"
         }
-        guard let image = UIImage(named: name) else { return nil }
+        let image = UIImage(named: name)
+        #endif
+
+        guard let image else { return nil }
         placeholderImageCache[key] = image
         return image
     }
+
+    #if WHITELABEL
+    private static func whitelabelPlaceholder(size: PodcastThumbnailSize, isDark: Bool) -> UIImage? {
+        let dimension: CGFloat
+        switch size {
+        case .list: dimension = 96
+        case .grid: dimension = 200
+        case .page, .detail: dimension = 300
+        }
+        let canvas = CGSize(width: dimension, height: dimension)
+        let background = isDark ? UIColor(white: 0.17, alpha: 1) : UIColor(white: 0.85, alpha: 1)
+        let glyphColor = isDark ? UIColor(white: 0.34, alpha: 1) : UIColor(white: 0.62, alpha: 1)
+        let renderer = UIGraphicsImageRenderer(size: canvas)
+        return renderer.image { _ in
+            background.setFill()
+            UIBezierPath(rect: CGRect(origin: .zero, size: canvas)).fill()
+            let config = UIImage.SymbolConfiguration(pointSize: dimension * 0.42, weight: .regular)
+            guard let glyph = UIImage(systemName: "waveform", withConfiguration: config)?
+                .withTintColor(glyphColor, renderingMode: .alwaysOriginal) else { return }
+            let origin = CGPoint(x: (canvas.width - glyph.size.width) / 2, y: (canvas.height - glyph.size.height) / 2)
+            glyph.draw(at: origin)
+        }
+    }
+    #endif
 
     func podcastUrl(imageSize: PodcastThumbnailSize, uuid: String) -> URL {
         let sizeRequired = ImageManager.sizeFor(imageSize: imageSize)

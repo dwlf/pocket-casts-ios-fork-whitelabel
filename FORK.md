@@ -280,6 +280,14 @@ A pre-push git hook enforces.
   the two-ring rotation animation. The PNGs (46@2x / 69@3x) are
   reproducible via `python3 scripts/generate_whitelabel_refresh.py`
   and sit inline in `podcasts/CommonImages.xcassets/`.
+- No-artwork placeholder: the upstream `noartwork-*` assets
+  (`podcasts/NoArtwork.xcassets/`) are the Pocket Casts logo, shown as
+  the cover placeholder on the grid, list, podcast page, and player
+  whenever a podcast/episode has no loaded artwork. Under
+  `#if WHITELABEL`, `ImageManager.placeHolderImage` renders a neutral
+  placeholder instead (plain panel + a generic `waveform` SF Symbol,
+  light/dark aware), with no new asset files. Branded forks may replace
+  it with their own art.
 - Other asset catalogs (`Onboarding`, `Subscription`, etc.) remain
   on the plan to be overlaid by neutral variants under a
   `Whitelabel.*.xcassets` parallel set with
