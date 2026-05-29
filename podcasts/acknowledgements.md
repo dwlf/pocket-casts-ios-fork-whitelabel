@@ -1,4 +1,13 @@
 # Acknowledgements
+
+## Open Source License
+
+This application includes software licensed under the Mozilla Public License, Version 2.0 (MPL-2.0).
+
+This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+Source code for the MPL-2.0 licensed components, including any modifications, is available at https://github.com/dwlf/pocket-casts-ios-fork-whitelabel.
+
 This application makes use of the following third party libraries:
 
 ## JLRoutes

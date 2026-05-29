@@ -392,6 +392,14 @@ product built on top of this fork:
   be any license you choose, including proprietary.
 - **Brand assets** (logos, fonts, illustrations) are yours and
   carry no license obligation from this fork.
+- **In-app license notice.** The Acknowledgements screen
+  (`podcasts/acknowledgements.html`, reachable via About → Legal &
+  More) carries the MPL-2.0 notice and a link to the MPL source. MPL
+  obligations are source-form, not UI — there is no requirement to
+  credit the upstream author by name, and the notice is worded to
+  avoid implying endorsement. A branded fork that keeps its MPL
+  modifications in a different public mirror should update that
+  source-code URL.
 
 ## Gotchas & verification notes
 
