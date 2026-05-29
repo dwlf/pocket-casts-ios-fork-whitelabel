@@ -117,3 +117,40 @@ sudo xcodebuild -runFirstLaunch
 
 The last step installs additional Xcode components (~1–3 minutes) and
 clears stale `IDESimulatorFoundation` plug-in load failures.
+
+## Deferred no-backend brand/upsell surfaces
+
+The no-backend degradation work (`fork#3`) gated the reachable
+Pocket Casts brand-art and subscription-upsell surfaces on
+`WhitelabelConfig.hasBackend`. The following surfaces are **not yet
+gated**. None are reachable in a normal public (empty-config) build —
+they require a login, an active subscription, or a seasonal trigger
+that the empty backend cannot produce — so they are deferred rather
+than leaks in the shipped experience. A branded fork *with* a backend
+runs the full upstream behaviour and is unaffected.
+
+- **Discover detail view controllers** (category / list / network /
+  collection summaries): their loading spinners do not stop on a
+  failed fetch, but they are only reachable *through* the Discover
+  tab, which already shows a graceful "Unable to load" state, so the
+  spinners cannot be reached without a backend.
+- **Share-surface brand art** (`PocketCastsLogoPill`,
+  `HowToShareActionImageView`, `ShareProfileCardView`,
+  `ShareDestination`): the Pocket Casts mark/wordmark appears on
+  clip/profile-card sharing UI. Sharing depends on the sharing
+  backend, so these are unreachable without a configured host.
+- **Plus/Patron badges, referral cards, promotion redemption,
+  Account-screen upgrade rows** (`SubscriptionBadge`,
+  `ReferralCardView`, `PromotionViewController`,
+  `AccountViewController` upgrade rows): all require a logged-in or
+  subscribed account, which is impossible without a backend.
+- **End-of-Year stories paywall and `eoy25_pc_logo` / `logo_pill`
+  art**: seasonal, and the End-of-Year feature is already excluded
+  from white-label builds.
+- **Widget brand art** (`logo_red_*`, `logo_white_*` in
+  `WidgetExtension`): widgets render their own Pocket Casts marks; a
+  branded fork supplies its own widget assets.
+
+When adding a backend-bearing branded fork, none of these need action.
+If a future build makes any of them reachable without a backend, gate
+them on `WhitelabelConfig.hasBackend` the same way `fork#3` did.
