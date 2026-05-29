@@ -33,7 +33,11 @@ extension AppDelegate {
 
         adapters.append(NotificationsCoordinator.shared)
 
-        if FeatureFlag.userSatisfactionSurvey.enabled {
+        // No-backend builds have nowhere for this survey to lead: the title
+        // names the upstream brand, "Yes" requests an App Store review of the
+        // upstream listing, and "Not really" opens an Automattic Zendesk email.
+        // Skip registering the adapter so the funnel never fires (fork#12).
+        if FeatureFlag.userSatisfactionSurvey.enabled, WhitelabelConfig.hasBackend {
             adapters.append(UserSatisfactionSurveyManager.shared)
         }
 

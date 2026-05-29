@@ -352,6 +352,12 @@ A pre-push git hook enforces.
     via on-device ingestion (below).
   - The About screen shows the brand name instead of the Pocket Casts
     logo.
+  - The user-satisfaction survey is suppressed (`fork#12`). Every outcome
+    leaks upstream: the title names Pocket Casts, "Yes" requests an App
+    Store review of the upstream listing, and "Not really" opens an
+    Automattic Zendesk email. `AppDelegate+Analytics` skips registering
+    `UserSatisfactionSurveyManager` as an analytics adapter unless
+    `hasBackend`, so the funnel never fires.
 - Backend-free podcast ingestion (`FeedIngestion`, in
   `podcasts/New Search/`). Pasting an RSS feed URL or an Apple Podcasts
   link (`podcasts.apple.com/.../id<digits>`) into the search bar adds
