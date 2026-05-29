@@ -87,6 +87,11 @@ public class RefreshManager {
     private func refresh(podcasts: [Podcast], completion: (() -> Void)? = nil) {
         UserDefaults.standard.set(Date(), forKey: ServerConstants.UserDefaults.lastRefreshStartTime)
 
+        if !WhitelabelConfig.hasBackend {
+            refreshLocalFeeds(podcasts: podcasts) { _ in completion?() }
+            return
+        }
+
         DispatchQueue.global().async {
             MainServerHandler.shared.refresh(podcasts: podcasts) { [weak self] refreshResponse in
                 guard let self else { return }
@@ -106,6 +111,11 @@ public class RefreshManager {
     // We can safely remove this method once we remove support to watchOS 10.
     private func refresh(podcasts: [Podcast], completion: (() -> Void)? = nil) {
         UserDefaults.standard.set(Date(), forKey: ServerConstants.UserDefaults.lastRefreshStartTime)
+
+        if !WhitelabelConfig.hasBackend {
+            refreshLocalFeeds(podcasts: podcasts) { _ in completion?() }
+            return
+        }
 
         DispatchQueue.global().async {
             let watchOsMajorVersion = WKInterfaceDevice.current().systemVersion.split(separator: ".")[safe: 0]
@@ -133,13 +143,39 @@ public class RefreshManager {
     #endif
 
     public func refreshPodcasts(completion: @escaping (RefreshFetchResult) -> Void) {
-        DispatchQueue.global().async {
+        DispatchQueue.global().async { [weak self] in
+            guard let self else { return }
             let podcasts = DataManager.sharedManager.allPodcasts(includeUnsubscribed: false)
+
+            if !WhitelabelConfig.hasBackend {
+                self.refreshLocalFeeds(podcasts: podcasts, completion: completion)
+                return
+            }
+
             MainServerHandler.shared.refresh(podcasts: podcasts) { [weak self] refreshResponse in
                 guard let self else { return }
 
                 self.processPodcastRefreshResponse(refreshResponse, completion: completion)
             }
+        }
+    }
+
+    /// No-backend refresh path: re-parses locally-ingested feeds on-device via
+    /// the sync delegate (the parser lives in the app target), then fires the
+    /// same refresh notifications the cache-host path does so the existing
+    /// refresh triggers light up unchanged.
+    private func refreshLocalFeeds(podcasts: [Podcast], completion: ((RefreshFetchResult) -> Void)? = nil) {
+        guard let syncDelegate = ServerConfig.shared.syncDelegate else {
+            ServerNotificationsHelper.shared.firePodcastRefreshFailed()
+            completion?(.failed)
+            return
+        }
+
+        syncDelegate.refreshLocalFeeds(podcasts: podcasts) { newEpisodes in
+            UserDefaults.standard.set(Date(), forKey: ServerConstants.UserDefaults.lastRefreshEndTime)
+            ServerNotificationsHelper.shared.firePodcastRefreshSucceeded()
+            FileLog.shared.addMessage("Local feed refresh complete found \(newEpisodes) new episodes")
+            completion?(newEpisodes > 0 ? .newData : .noData)
         }
     }
 

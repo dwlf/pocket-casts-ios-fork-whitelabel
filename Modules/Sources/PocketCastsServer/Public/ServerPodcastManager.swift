@@ -185,6 +185,31 @@ public class ServerPodcastManager: NSObject {
         addPodcast(podcastInfo: podcastInfo, subscribe: subscribe, autoDownloads: 0, lastModified: nil)
     }
 
+    /// Adds only the episodes from a re-parsed local feed that aren't already
+    /// stored, identified by their (deterministic) UUID. `podcastInfo` matches
+    /// the shape `addPodcast` consumes. The podcast must already exist. Returns
+    /// the number of new episodes added.
+    @discardableResult
+    public func addMissingEpisodesFromFeed(podcastInfo: [String: Any]) -> Int {
+        guard let podcastJson = podcastInfo["podcast"] as? [String: Any],
+              let podcastUuid = podcastJson["uuid"] as? String,
+              let episodesJson = podcastJson["episodes"] as? [[String: Any]],
+              let podcast = DataManager.sharedManager.findPodcast(uuid: podcastUuid, includeUnsubscribed: true) else { return 0 }
+
+        var newEpisodes = [Episode]()
+        for episodeJson in episodesJson {
+            guard let uuid = episodeJson["uuid"] as? String, DataManager.sharedManager.findEpisode(uuid: uuid) == nil else { continue }
+            newEpisodes.append(Episode.from(episodeJson: episodeJson, podcastId: podcast.id, podcastUuid: podcast.uuid, isoFormatter: isoFormatter))
+        }
+
+        guard !newEpisodes.isEmpty else { return 0 }
+
+        DataManager.sharedManager.bulkSave(episodes: newEpisodes)
+        updateLatestEpisodeInfo(podcast: podcast, setDefaults: false)
+
+        return newEpisodes.count
+    }
+
     private func addPodcast(podcastInfo: [String: Any], subscribe: Bool, autoDownloads: Int = 0, lastModified: String?) -> Bool {
         guard let podcastJson = podcastInfo["podcast"] as? [String: Any], let podcastUuid = podcastJson["uuid"] as? String else { return false }
 

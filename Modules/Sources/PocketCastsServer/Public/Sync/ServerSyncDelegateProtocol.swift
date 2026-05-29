@@ -8,6 +8,12 @@ public protocol ServerSyncDelegate {
     func checkForUnusedPodcasts()
     func applyAutoArchivingToAllPodcasts()
 
+    /// Re-parses locally-ingested RSS feeds on-device and adds any new
+    /// episodes. Used by no-backend builds, where the cache host has no record
+    /// of locally-parsed feeds. `completion` receives the number of new
+    /// episodes added across all podcasts.
+    func refreshLocalFeeds(podcasts: [Podcast], completion: @escaping (Int) -> Void)
+
     func subscribedToPodcast()
 
     func playlistChanged()
@@ -37,4 +43,12 @@ public protocol ServerSyncDelegate {
     func privateUserAgent() -> String
     func minTimeBetweenProgressSaves() -> Double
     func production() -> Bool
+}
+
+public extension ServerSyncDelegate {
+    // Default no-op for conformers that don't ingest local feeds (e.g. watchOS,
+    // which has no on-device feed parser).
+    func refreshLocalFeeds(podcasts: [Podcast], completion: @escaping (Int) -> Void) {
+        completion(0)
+    }
 }

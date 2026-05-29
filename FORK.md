@@ -366,8 +366,22 @@ A pre-push git hook enforces.
   ingests on the as-you-type timer so a pasted link adds without a
   separate submit. The feed's `<itunes:image>` is shown as the cover
   art — `ImageManager.podcastUrl` prefers `Podcast.imageURL` over the
-  cache-host CDN URL when set (`#if WHITELABEL`). Feed refresh is not
-  yet wired — see `docs/known-issues.md`.
+  cache-host CDN URL when set (`#if WHITELABEL`).
+- No-backend feed refresh (`fork#11`). When `WhitelabelConfig.hasBackend`
+  is false, the two refresh entry points each re-parse feeds on-device
+  instead of the cache host — they are separate paths and both had to be
+  wired: `RefreshManager` for library-wide triggers (grid pull-to-refresh,
+  background, foreground), and `PodcastFeedViewModel.reloadFeed` for the
+  per-podcast detail-screen pull-to-refresh (which otherwise calls
+  `MainServerHandler.updatePodcast` and silently no-ops with no backend).
+  The parser lives in the app target, so the Server module reaches it
+  through a new `ServerSyncDelegate.refreshLocalFeeds` seam (default no-op,
+  overridden by `ServerSyncManager`); `FeedIngestion.refresh(podcast:)`
+  re-fetches the stored `podcastUrl` and `ServerPodcastManager`.`addMissingEpisodesFromFeed`
+  inserts only episodes whose deterministic UUID isn't already stored. The
+  detail-screen path posts `podcastUpdated` so the open episode list reloads.
+  Backend builds keep the cache-host path. The backend-build + pasted-RSS
+  edge case stays deferred — see `docs/known-issues.md`.
 - `.buildkite/` is present but inert. Automattic CI infrastructure
   is not available here.
 - `.configure-files/` ships empty. The inherited `pocketcasts`

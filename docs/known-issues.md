@@ -155,16 +155,23 @@ When adding a backend-bearing branded fork, none of these need action.
 If a future build makes any of them reachable without a backend, gate
 them on `WhitelabelConfig.hasBackend` the same way `fork#3` did.
 
-## Locally-ingested feeds: no refresh
+## Locally-ingested feeds: backend-build re-parse not wired
 
-Podcasts added via `FeedIngestion` (RSS URL or Apple Podcasts link)
-capture their episodes at add time only:
+Refresh for locally-ingested feeds is wired for no-backend builds
+(`fork#11`): when `WhitelabelConfig.hasBackend == false`, `RefreshManager`
+routes every refresh trigger (pull-to-refresh, background, foreground) to
+an on-device re-parse via the `ServerSyncDelegate.refreshLocalFeeds` seam
+instead of the cache host. The deterministic episode UUIDs make the
+re-parse idempotent — existing episodes are matched and skipped, only new
+ones are inserted.
 
-- **No refresh.** The normal refresh path goes through the Pocket Casts
-  cache host, which has no record of a locally-parsed feed, so new
-  episodes won't appear until a refresh path re-parses the feed. The
-  deterministic UUIDs make a future re-parse idempotent (it will upsert
-  rather than duplicate).
+The remaining gap is **backend builds with manually-pasted RSS feeds**.
+`FeedIngestion` runs in any build when a URL is pasted into search, so a
+backend-bearing fork can hold a locally-ingested podcast the cache host
+doesn't know about. Those podcasts are not re-parsed (the `hasBackend`
+gate keeps backend builds on the cache-host path). To cover that case,
+detect locally-ingested podcasts per-podcast (by stored `podcastUrl`) and
+re-parse them alongside the cache-host refresh.
 
 Cover art *is* shown: `ImageManager.podcastUrl` prefers the podcast's
 `imageURL` (set from the feed's `<itunes:image>`) over the cache-host

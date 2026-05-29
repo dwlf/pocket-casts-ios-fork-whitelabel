@@ -28,6 +28,22 @@ class ServerSyncManager: ServerSyncDelegate {
         PodcastManager.shared.applyAutoArchivingToAllPodcasts()
     }
 
+    #if !APPCLIP
+    func refreshLocalFeeds(podcasts: [Podcast], completion: @escaping (Int) -> Void) {
+        Task {
+            var newEpisodes = 0
+            for podcast in podcasts {
+                do {
+                    newEpisodes += try await FeedIngestion.refresh(podcast: podcast)
+                } catch {
+                    FileLog.shared.addMessage("Local feed refresh failed for \(podcast.uuid): \(error)")
+                }
+            }
+            completion(newEpisodes)
+        }
+    }
+    #endif
+
     func subscribedToPodcast() {
         AnalyticsHelper.subscribedToPodcast()
     }

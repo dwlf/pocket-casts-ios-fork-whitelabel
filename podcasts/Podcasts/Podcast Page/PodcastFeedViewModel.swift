@@ -54,18 +54,7 @@ class PodcastFeedViewModel {
                     Toast.show(L10n.podcastFeedReloadLoading, dismissAfter: .never)
                 }
             }
-            let success: Bool
-            do {
-                success = try await MainServerHandler.shared.updatePodcast(uuid: uuid, lastEpisodeUuid: podcast.latestEpisodeUuid)
-            } catch {
-                success = false
-                FileLog.shared.console("Failed update podcast \(uuid) - \(error.localizedDescription)")
-            }
-
-            if success {
-                FileLog.shared.console("Refresh manager update podcast \(uuid)")
-                await RefreshManager.shared.refresh(podcast: podcast, from: uuid)
-            }
+            let success = await self.reloadFeed(podcast: podcast, uuid: uuid)
 
             await MainActor.run {
                 if self.loadingState != .cancelled {
@@ -86,5 +75,33 @@ class PodcastFeedViewModel {
             return success
         }
         return await podcastFeedReloadTask?.value ?? false
+    }
+
+    /// Pulls new episodes for a single podcast. No-backend builds re-parse the
+    /// locally-ingested RSS feed on-device and post `podcastUpdated` so the
+    /// detail screen reloads its episode list; backend builds ask the cache
+    /// host and let `RefreshManager` apply the delta. Returns whether any new
+    /// episodes were found.
+    private func reloadFeed(podcast: Podcast, uuid: String) async -> Bool {
+        if !WhitelabelConfig.hasBackend {
+            let newEpisodes = (try? await FeedIngestion.refresh(podcast: podcast)) ?? 0
+            FileLog.shared.console("Local feed reload for podcast \(uuid) found \(newEpisodes) new episodes")
+            if newEpisodes > 0 {
+                NotificationCenter.postOnMainThread(notification: Constants.Notifications.podcastUpdated, object: uuid)
+            }
+            return newEpisodes > 0
+        }
+
+        do {
+            let success = try await MainServerHandler.shared.updatePodcast(uuid: uuid, lastEpisodeUuid: podcast.latestEpisodeUuid)
+            if success {
+                FileLog.shared.console("Refresh manager update podcast \(uuid)")
+                await RefreshManager.shared.refresh(podcast: podcast, from: uuid)
+            }
+            return success
+        } catch {
+            FileLog.shared.console("Failed update podcast \(uuid) - \(error.localizedDescription)")
+            return false
+        }
     }
 }

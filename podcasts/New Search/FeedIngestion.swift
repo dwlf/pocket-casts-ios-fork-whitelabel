@@ -45,6 +45,33 @@ enum FeedIngestion {
         return try add(feedData: data, feedURL: feedURL, subscribe: subscribe)
     }
 
+    /// Re-fetches and re-parses an already-added podcast's feed, adding any
+    /// episodes not already stored. The deterministic episode UUIDs make this
+    /// idempotent: existing episodes are matched and skipped, only new ones are
+    /// inserted. Returns the number of new episodes added.
+    @discardableResult
+    static func refresh(podcast: Podcast) async throws -> Int {
+        guard let feedString = podcast.podcastUrl, let feedURL = URL(string: feedString) else { return 0 }
+
+        let (data, response) = try await URLSession.shared.data(from: feedURL)
+        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+            throw IngestionError.feedFetchFailed
+        }
+
+        let document: AEXMLDocument
+        do {
+            document = try AEXMLDocument(xmlData: data)
+        } catch {
+            throw IngestionError.feedParseFailed
+        }
+
+        let episodeJson = episodes(from: document.root["channel"])
+        guard !episodeJson.isEmpty else { return 0 }
+
+        let podcastInfo: [String: Any] = ["podcast": ["uuid": podcast.uuid, "episodes": episodeJson]]
+        return ServerPodcastManager.shared.addMissingEpisodesFromFeed(podcastInfo: podcastInfo)
+    }
+
     // MARK: - Resolve
 
     private static func resolveFeedURL(from input: String) async throws -> URL {
